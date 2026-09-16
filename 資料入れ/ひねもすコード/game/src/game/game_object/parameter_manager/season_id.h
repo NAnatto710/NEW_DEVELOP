@@ -1,0 +1,23 @@
+
+/*!
+ *  @file       season_id.h
+ *  @brief      ãGêﬂID
+ *  @author     Ryusei Shimizu
+ *  @date       2025/10/20
+ */
+
+#pragma once
+
+/*
+ *	@brief		ãGêﬂä«óùID
+ */
+enum class SEASON_ID
+{
+	DUMMY = -1		//!< É_É~Å[ID
+	, WINTER			//!< ì~
+	, SPRING			//!< èt
+	, SUMMER			//!< âƒ
+	, AUTUMN			//!< èH
+
+	, MAX				//!< ç≈ëÂíl
+};
