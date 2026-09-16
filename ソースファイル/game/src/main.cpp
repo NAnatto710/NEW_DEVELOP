@@ -11,6 +11,9 @@
  */
 
 #include "vivid.h"
+#include "game\\game.h"
+
+CGame game;
 
 /*!
  *  @brief      描画関数
@@ -18,6 +21,11 @@
 void
 Display(void)
 {
+    // ゲーム更新
+    game.GameUpdate();
+
+    // ゲーム描画
+    game.GameDraw();
 }
 
 /*!
@@ -40,11 +48,17 @@ WinMain( _In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInst, _In_ LPSTR lpCmdLin
     // vividライブラリ初期化
     vivid::Initialize( hInst );
 
+    // ゲーム初期化
+    game.GameInitialize();
+
     // 更新/描画関数登録
     vivid::DisplayFunction( Display );
 
     // ゲームループ
     vivid::MainLoop( );
+
+    // ゲーム解放
+    game.GameFinalize();
 
     // vividライブラリ解放
     vivid::Finalize( );

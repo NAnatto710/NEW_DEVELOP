@@ -164,12 +164,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game\game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\utility\utility.cpp" />
+    <ClCompile Include="src\utility\collision\collision.cpp" />
+    <ClCompile Include="src\utility\csv\csv.cpp" />
+    <ClCompile Include="src\utility\sound\sound.cpp" />
+    <ClCompile Include="src\utility\movie\movie.cpp" />
+    <ClCompile Include="src\utility\data\data.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\vivid2d\vivid2d.vcxproj">
       <Project>{f852ae89-c481-4e06-b523-26516b7a128c}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\game\game.h" />
+    <ClInclude Include="src\game\game_object\game_object.h" />
+    <ClInclude Include="src\utility\utility.h" />
+    <ClInclude Include="src\utility\utility_object.h" />
+    <ClInclude Include="src\utility\collision\collision.h" />
+    <ClInclude Include="src\utility\csv\csv.h" />
+    <ClInclude Include="src\utility\sound\sound.h" />
+    <ClInclude Include="src\utility\sound\sound_id.h" />
+    <ClInclude Include="src\utility\movie\movie.h" />
+    <ClInclude Include="src\utility\data\data.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
