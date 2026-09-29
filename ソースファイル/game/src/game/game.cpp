@@ -54,4 +54,6 @@ void
 CGame::
 GameFinalize(void)
 {
+	Utility::Sound::Finalize();
+	Utility::Movie::Finalize();
 }
