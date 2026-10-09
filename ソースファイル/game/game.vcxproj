@@ -172,6 +172,7 @@
     <ClCompile Include="src\game\game_object\scene_manager\scene\scene.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene\sub_scene\pause\pause.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene_manager.cpp" />
+    <ClCompile Include="src\game\game_object\scene_manager\scene_transition.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\utility\utility.cpp" />
     <ClCompile Include="src\utility\collision\collision.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="src\game\game_object\scene_manager\scene\sub_scene\pause\pause.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene_id.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene_manager.h" />
+    <ClInclude Include="src\game\game_object\scene_manager\scene_transition.h" />
     <ClInclude Include="src\utility\utility.h" />
     <ClInclude Include="src\utility\collision\collision.h" />
     <ClInclude Include="src\utility\csv\csv.h" />

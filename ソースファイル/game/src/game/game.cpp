@@ -1,4 +1,4 @@
-
+﻿
 /*!
  *  @file       game.cpp
  *  @brief      ゲーム管理
@@ -25,6 +25,8 @@ GameInitialize(void)
 	Utility::Data::Init();
 
 	Utility::Data::Load();
+
+	CSceneManager::GetInstance().Initialize();
 }
 
 /*
@@ -36,6 +38,8 @@ GameUpdate(void)
 {
 	// Utility更新
 	Utility::Sound::Update();
+
+	CSceneManager::GetInstance().Update();
 }
 
 /*
@@ -45,6 +49,8 @@ void
 CGame::
 GameDraw(void)
 {
+	CSceneManager::GetInstance().Draw();
+	CSceneManager::GetInstance().DrawSceneEffect();
 }
 
 /*
@@ -54,6 +60,7 @@ void
 CGame::
 GameFinalize(void)
 {
+	CSceneManager::GetInstance().Finalize();
 	Utility::Sound::Finalize();
 	Utility::Movie::Finalize();
 }

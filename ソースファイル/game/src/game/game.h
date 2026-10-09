@@ -1,4 +1,4 @@
-
+﻿
 /*!
  *  @file           game.h
  *  @brief          ゲーム管理
@@ -9,6 +9,7 @@
 #pragma once
 
 #include "vivid.h"
+#include "game_object/scene_manager/scene_manager.h"
 
 class CGame
 {

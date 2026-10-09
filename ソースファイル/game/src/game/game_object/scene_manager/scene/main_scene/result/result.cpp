@@ -7,6 +7,7 @@
  */
 
 #include "result.h"
+#include "../../../scene_manager.h"
 
 /*
  *	コンストラクタ
@@ -33,6 +34,8 @@ void
 CResult::
 Update (void)
 {
+	if (vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::LEFT))
+		CSceneManager::GetInstance().ChangeMainScene(MAIN_SCENE_ID::TITLE);
 }
 
 /*

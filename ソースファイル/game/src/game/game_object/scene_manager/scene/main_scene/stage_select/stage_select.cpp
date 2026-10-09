@@ -7,6 +7,7 @@
  */
 
 #include "stage_select.h"
+#include "../../../scene_manager.h"
 
 /*
  *	コンストラクタ
@@ -33,6 +34,8 @@ void
 CStageSelect::
 Update (void)
 {
+	if (vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::LEFT))
+		CSceneManager::GetInstance().ChangeMainScene(MAIN_SCENE_ID::GAME_MAIN);
 }
 
 /*
