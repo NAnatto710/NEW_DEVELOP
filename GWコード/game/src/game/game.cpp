@@ -16,7 +16,7 @@ void
 CGame::
 GameInitialize(void)
 {
-	// マウスカーソル表示
+	// リリース版でもマウスカーソルを表示できる
 	SetMouseDispFlag(true);
 
 	// Utility初期化

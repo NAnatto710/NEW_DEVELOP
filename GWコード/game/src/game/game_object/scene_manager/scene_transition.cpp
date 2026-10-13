@@ -12,8 +12,8 @@
 #include <algorithm>
 #include <cmath>
 
-const int CSceneTransition::m_tile_size     = 32;   //!< タイルサイズ
-const int CSceneTransition::m_change_frame  = 30;   //!< シーンチェンジのフレーム数
+const int CSceneTransition::m_tile_size     = 30;   //!< タイルサイズ
+const int CSceneTransition::m_change_frame  = 50;   //!< シーンチェンジのフレーム数
 
 /*
  *  初期化
@@ -29,34 +29,9 @@ Initialize(void)
 
 	// タイル作成
     this->CreateTiles();
-}
 
-/*
- *  外周から中央へ黒くする
- */
-void
-CSceneTransition::
-Cover(void)
-{
-    m_Cover = true;
-
-	// 演出が完了していない場合はカウントを進める
-    if (m_Count < m_change_frame)
-        ++m_Count;
-}
-
-/*
- *  中央から外周へ黒を消す
- */
-void
-CSceneTransition::
-Reveal(void)
-{
-    m_Cover = false;
-
-	// 演出が完了していない場合はカウントを減らす
-    if (m_Count > 0)
-        --m_Count;
+    // タイル色設定
+    this->RandomizeTileColors();
 }
 
 /*
@@ -67,8 +42,6 @@ CSceneTransition::
 Draw(void)
 {
     if (m_Tiles.empty()) return;
-
-    const int color = Utility::Color(Utility::ColorID::Black);
 
     // 完全に開いた後は何も描かない
     if (!m_Cover && m_Count <= 0) return;
@@ -89,14 +62,45 @@ Draw(void)
         else
         {
             // 中央から外周へ黒を消す
-            // revealProgress : 0.0 -> 1.0
             const float revealProgress = 1.0f - progress;
             draw = (revealProgress < tile.distance);
         }
 
         if (draw)
-            DxLib::DrawBox(tile.x, tile.y, tile.x + tile.width, tile.y + tile.height, color, TRUE);
+            DxLib::DrawBox(tile.x, tile.y, tile.x + tile.width, tile.y + tile.height, tile.color, TRUE);
     }
+}
+
+/*
+ *  外周から中央へ黒くする
+ */
+void
+CSceneTransition::
+Cover(void)
+{
+    if (!m_Cover)
+    {
+        this->RandomizeTileColors();
+        m_Cover = true;
+    }
+
+    // 演出が完了していない場合はカウントを進める
+    if (m_Count < m_change_frame)
+        ++m_Count;
+}
+
+/*
+ *  中央から外周へ黒を消す
+ */
+void
+CSceneTransition::
+Reveal(void)
+{
+    m_Cover = false;
+
+    // 演出が完了していない場合はカウントを減らす
+    if (m_Count > 0)
+        --m_Count;
 }
 
 /*
@@ -153,7 +157,7 @@ CreateTiles(void)
 
     float maxDistance = 0.0f;
 
-	// タイルを作成し、中心からの距離を計算する
+	// タイルを作成し、中心からの距離を計算
     for (int row = 0; row < rows; ++row)
     {
 		// タイルの左上座標とサイズを計算
@@ -178,11 +182,35 @@ CreateTiles(void)
         }
     }
 
-    // 正規化により、すべてのタイルが規定フレーム内で切り替わる。
+    // すべてのタイルが規定フレーム内で切り替わるようにする
     if (maxDistance > 0.0f)
     {
 		// 中心からの距離を正規化する
         for (auto& tile : m_Tiles)
             tile.distance /= maxDistance;
+    }
+}
+
+/*
+ *  タイル色のランダム更新
+ */
+void
+CSceneTransition::
+RandomizeTileColors(void)
+{
+    // シーンチェンジエフェクトのカラーテーブル
+    const unsigned int colors[] =
+    {
+        0xffffffff,
+        0xfff0f0f0,
+        0xffeeeeee,
+        0xffe0e0e0,
+        0xffdddddd
+    };
+
+    // 全タイルにランダムなカラーテーブルの色を入れる
+    for (auto& tile : m_Tiles)
+    {
+        tile.color = colors[Utility::RandInt(0,4)];
     }
 }

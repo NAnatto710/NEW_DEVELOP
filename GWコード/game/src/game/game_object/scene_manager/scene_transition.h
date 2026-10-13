@@ -18,6 +18,11 @@ public:
     void            Initialize(void);
 
     /*!
+     *  @brief      描画
+     */
+    void            Draw(void);
+
+    /*!
      *  @brief      外周から中央へ黒くする
      */
     void            Cover(void);
@@ -26,11 +31,6 @@ public:
      *  @brief      中央から外周へ黒を消す
      */
     void            Reveal(void);
-
-    /*!
-     *  @brief      シーンエフェクト描画
-     */
-    void            Draw(void);
 
     /*!
      *  @brief      全面が黒いか
@@ -54,17 +54,23 @@ private:
 	 */
     struct TILE
     {
-		int         x;          //!< タイルの左上X座標
-		int         y;          //!< タイルの左上Y座標
-		int         width;      //!< タイルの幅
-		int         height;     //!< タイルの高さ
-		float       distance;   //!< 中心からの距離
+		int             x;          //!< タイルの左上X座標
+		int             y;          //!< タイルの左上Y座標
+		int             width;      //!< タイルの幅
+		int             height;     //!< タイルの高さ
+		float           distance;   //!< 中心からの距離
+        unsigned int    color;      //!< 描画色
     };
 
     /*!
      *  @brief      タイル作成
 	 */
     void            CreateTiles(void);
+
+    /*!
+     *  @brief      タイル色のランダム更新
+     */
+    void            RandomizeTileColors(void);
 
     static const int        m_tile_size;            //!< タイルサイズ
     static const int        m_change_frame;         //!< Cover/Revealそれぞれのフレーム数（60FPS想定）

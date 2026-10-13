@@ -165,6 +165,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\game\game.cpp" />
+    <ClCompile Include="src\game\game_object\character_manager\character\character.cpp" />
+    <ClCompile Include="src\game\game_object\character_manager\character\component\movement\movement_component.cpp" />
+    <ClCompile Include="src\game\game_object\character_manager\character\component\physics\physics_component.cpp" />
+    <ClCompile Include="src\game\game_object\character_manager\character\player\player.cpp" />
+    <ClCompile Include="src\game\game_object\character_manager\character_manager.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene\main_scene\game_main\game_main.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene\main_scene\result\result.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene\main_scene\stage_select\stage_select.cpp" />
@@ -173,6 +178,9 @@
     <ClCompile Include="src\game\game_object\scene_manager\scene\sub_scene\pause\pause.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene_manager.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene_transition.cpp" />
+    <ClCompile Include="src\game\game_object\stage_manager\stage_manager.cpp" />
+    <ClCompile Include="src\game\game_object\stage_manager\stage_object\block\normal_block\normal_block.cpp" />
+    <ClCompile Include="src\game\game_object\stage_manager\stage_object\stage_object.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\utility\utility.cpp" />
     <ClCompile Include="src\utility\collision\collision.cpp" />
@@ -188,6 +196,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\game.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\charater.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\component\component_object.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\component\movement\movement_component.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\component\physics\physics_component.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\component\physics\vector.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\player\player.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character_manager.h" />
     <ClInclude Include="src\game\game_object\game_object.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene\main_scene\game_main\game_main.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene\main_scene\result\result.h" />
@@ -199,6 +214,11 @@
     <ClInclude Include="src\game\game_object\scene_manager\scene_id.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene_manager.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene_transition.h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_manager.h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\block_object].h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\normal_block\normal_block.h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object.h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object_id.h" />
     <ClInclude Include="src\utility\utility.h" />
     <ClInclude Include="src\utility\collision\collision.h" />
     <ClInclude Include="src\utility\csv\csv.h" />
