@@ -215,7 +215,7 @@
     <ClInclude Include="src\game\game_object\scene_manager\scene_manager.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene_transition.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_manager.h" />
-    <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\block_object].h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\block_object.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\normal_block\normal_block.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object_id.h" />
