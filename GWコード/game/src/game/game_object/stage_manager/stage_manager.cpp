@@ -1,9 +1,9 @@
 ﻿
 /*!
- *  @file		stage_manager.cpp
- *  @brief		ステージ管理
- *  @author     Ryusei Shimizu
- *  @date       2026/10/14
+ *  @file			stage_manager.cpp
+ *  @brief			ステージ管理
+ *  @author			Ryusei Shimizu
+ *  @date			2026/10/14
  */
 
 #include "stage_manager.h"
@@ -39,68 +39,49 @@ Initialize()
 
 	m_BlockSize = IStageObject::GetSize();
 
-	// CSVを読み込み、数値をステージオブジェクトIDとして保持する。
-    // CSVはヘッダーなし。1セルを1マスのステージオブジェクトIDとして扱う。
+	// CSVを読み込み、数値をステージオブジェクトIDとして保持する
     Utility::CSV::Rows rows;
-    if (!Utility::CSV::Load(m_map_file_name, rows, false) || rows.empty() || rows.front().empty())
-    {
-        return;
-    }
+    if (!Utility::CSV::Load(m_map_file_name, rows, false) || rows.empty() || rows.front().empty()) return;
 
-    // 先頭行の列数を横幅とし、行数を縦幅とする。
+    // 先頭行の列数を横幅とし、行数を縦幅とする
     const std::size_t width = rows.front().size();
-    if (width > static_cast<std::size_t>(std::numeric_limits<int>::max()) ||
-        rows.size() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
-    {
-        return;
-    }
 
-    // 途中で不正データが見つかった場合に既存の管理配列を汚さないよう、一時配列へ読み込む。
-    std::vector<std::vector<unsigned char>> loadedMap;
-    loadedMap.reserve(rows.size());
+	m_MapObject.reserve(rows.size());
 
     for (const auto& row : rows)
     {
-        // 行ごとの列数が異なるCSVは不正なマップとして中断する。
+        // 行ごとの列数が異なるCSVは中断する
         if (!Utility::CSV::CheckColumns(row, width)) return;
 
         std::vector<unsigned char> line;
         line.reserve(width);
         for (std::size_t x = 0; x < width; ++x)
         {
-            // 数値以外のセルは例外になるため、下のcatchで初期化を中断する。
+			// CSVの数値がSTAGE_OBJECT_IDの範囲外なら中断する
             const int id = Utility::CSV::Get<int>(row, x);
-            if (id < 0 || id >= static_cast<int>(STAGE_OBJECT_ID::MAX))
-            {
-                return; // 未定義のIDを含むCSVは読み込まない
-            }
+            if (id < 0 || id >= static_cast<int>(STAGE_OBJECT_ID::MAX)) return;
+
             line.push_back(static_cast<unsigned char>(id));
         }
-        loadedMap.push_back(std::move(line));
+		m_MapObject.push_back(std::move(line));
     }
 
-    // すべての値が有効だと確認できた時点で正式なマップデータに反映する。
-    m_MapObject = std::move(loadedMap);
-    m_map_chip_count_height = static_cast<int>(m_MapObject.size());
     m_map_chip_count_width = static_cast<int>(width);
+    m_map_chip_count_height = static_cast<int>(m_MapObject.size());
 
-    // 各マスに生成したオブジェクトへのポインタを保存する。空マスはnullptr。
-    m_StageObject.assign(m_map_chip_count_height,
-                         std::vector<IStageObject*>(m_map_chip_count_width, nullptr));
+    // 各マスに生成したオブジェクトへのポインタを保存する
+    m_StageObject.assign(m_map_chip_count_height, std::vector<IStageObject*>(m_map_chip_count_width, nullptr));
 
     for (int y = 0; y < m_map_chip_count_height; ++y)
     {
         for (int x = 0; x < m_map_chip_count_width; ++x)
         {
-            // IDがNONEならnullptr、NORMAL_BLOCKならCNormalBlockなどの実体を生成する。
-            IStageObject* stage_object = CreateStageObject(
-                static_cast<STAGE_OBJECT_ID>(m_MapObject[y][x]));
+            IStageObject* stage_object = CreateStageObject(static_cast<STAGE_OBJECT_ID>(m_MapObject[y][x]));
 
             if (stage_object)
             {
                 const float size = static_cast<float>(stage_object->GetSize());
 
-                // CSVの列・行インデックスをワールド座標へ変換する。
                 stage_object->SetPosition(vivid::Vector2(x * size, y * size));
 
                 m_StageObject[y][x] = stage_object;
@@ -120,7 +101,7 @@ Update()
 	{
 		for (int k = 0; k < m_map_chip_count_width; k++)
 		{
-			// オブジェクトが存在するマスだけ更新する。
+			// オブジェクトが存在するマスだけ更新する
 			if (m_StageObject[i][k])
 				m_StageObject[i][k]->Update();
 		}
@@ -138,7 +119,7 @@ Draw()
 	{
 		for (int k = 0; k < m_map_chip_count_width; k++)
 		{
-			// オブジェクトが存在するマスだけ描画する。
+			// オブジェクトが存在するマスだけ描画する
 			if (m_StageObject[i][k])
 				m_StageObject[i][k]->Draw();
 		}
@@ -152,7 +133,6 @@ void
 CStageManager::
 Finalize()
 {
-	// 各オブジェクトに終了処理を呼んでからdeleteし、メモリリークを防ぐ。
 	for (auto& row : m_StageObject)
 	{
 		for (auto& obj : row)
@@ -166,7 +146,6 @@ Finalize()
 		}
 	}
 
-	// 次回Initialize時に古いマップが残らないよう、配列とサイズをリセットする。
 	m_StageObject.clear();
 	m_MapObject.clear();
 	m_map_chip_count_width = 0;
@@ -212,14 +191,12 @@ GetStageObject(int x, int y) const
 {
 	if (x < 0 || y < 0) return nullptr;
 
-	// 引数のx, yはタイル番号ではなくワールド上のピクセル座標。
-	// 1マスの大きさで割ってCSV上の列・行インデックスを求める。
+	// 引数のx, yはタイル番号ではなくワールド上のピクセル座標
 	int ix = x / IStageObject::GetSize();
 	int iy = y / IStageObject::GetSize();
 
-	// マップ外参照を防止。
-	if (ix < 0 || ix >= m_map_chip_count_width || iy < 0 || iy >= m_map_chip_count_height)
-		return nullptr;
+	// マップ外参照を防止
+	if (ix < 0 || ix >= m_map_chip_count_width || iy < 0 || iy >= m_map_chip_count_height) return nullptr;
 
 	return m_StageObject[iy][ix];
 }
@@ -267,15 +244,12 @@ CreateStageObject(STAGE_OBJECT_ID stage_object_id)
 {
 	IStageObject* stage_object = nullptr;
 
-	// CSVの数値と列挙型を対応させ、必要な派生クラスを生成する。
-	// 新しい地形IDを追加する場合はここにもcaseを追加する。
 	switch (stage_object_id)
 	{
 	case STAGE_OBJECT_ID::NORMAL_BLOCK:		stage_object = new CNormalBlock();	break;
 	case STAGE_OBJECT_ID::NONE:
 	case STAGE_OBJECT_ID::MAX:
-	default:
-		break;
+	default:		break;
 	}
 
 	// 生成されたステージオブジェクトが存在する場合は初期化

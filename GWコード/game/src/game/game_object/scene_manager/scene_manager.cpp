@@ -28,7 +28,7 @@ Initialize(void)
     this->Finalize();
 
     m_CurrentMainSceneID = MAIN_SCENE_ID::NONE;
-    m_NextMainSceneID = MAIN_SCENE_ID::TITLE;
+    m_NextMainSceneID = MAIN_SCENE_ID::GAME_MAIN;
     m_CurrentSubSceneID = SUB_SCENE_ID::NONE;
     m_NextSubSceneID = SUB_SCENE_ID::NONE;
 

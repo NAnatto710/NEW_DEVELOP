@@ -8,6 +8,7 @@
 
 #include "game_main.h"
 #include "../../../scene_manager.h"
+#include "../../../../game_object.h"
 
 /*
  *	コンストラクタ
@@ -25,6 +26,8 @@ void
 CGameMain::
 Initialize (void)
 {
+	CStageManager::GetInstance ().Initialize();
+	CCharacterManager::GetInstance ().Initialize({100.0f, 100.0f}, 64, 64);
 }
 
 /*
@@ -34,8 +37,13 @@ void
 CGameMain::
 Update (void)
 {
-	if (vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::LEFT))
+	CStageManager::GetInstance ().Update();
+	CCharacterManager::GetInstance ().Update ();
+
+	if (vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::Z))
 		CSceneManager::GetInstance().ChangeMainScene(MAIN_SCENE_ID::RESULT);
+	if(vivid::keyboard::Trigger (vivid::keyboard::KEY_ID::X))
+		CSceneManager::GetInstance ().ChangeSubScene(SUB_SCENE_ID::PAUSE);
 }
 
 /*
@@ -45,6 +53,9 @@ void
 CGameMain::
 Draw (void)
 {
+	CStageManager::GetInstance ().Draw();
+	CCharacterManager::GetInstance ().Draw ();
+
 	IScene::Draw();
 }
 
@@ -55,4 +66,6 @@ void
 CGameMain::
 Finalize (void)
 {
+	CStageManager::GetInstance ().Finalize();
+	CCharacterManager::GetInstance ().Finalize ();
 }

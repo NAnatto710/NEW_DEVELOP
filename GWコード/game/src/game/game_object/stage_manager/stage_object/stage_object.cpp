@@ -11,7 +11,7 @@
 //#include "../../camera_manager/camera_manager.h"
 
 const int           IStageObject::m_default_size = 60;
-const std::string   IStageObject::m_map_chip_file_name = "data\\map\\box60.png";
+const std::string   IStageObject::m_map_chip_file_name = "data\\object\\box60.png";
 
 
 /*

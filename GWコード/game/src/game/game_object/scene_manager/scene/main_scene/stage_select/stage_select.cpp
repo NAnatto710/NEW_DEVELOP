@@ -34,7 +34,7 @@ void
 CStageSelect::
 Update (void)
 {
-	if (vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::LEFT))
+	if(vivid::keyboard::Trigger (vivid::keyboard::KEY_ID::Z))
 		CSceneManager::GetInstance().ChangeMainScene(MAIN_SCENE_ID::GAME_MAIN);
 }
 

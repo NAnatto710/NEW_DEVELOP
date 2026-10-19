@@ -1,9 +1,9 @@
 ﻿
 /*!
- *  @file		stage_manager.h
- *  @brief		ステージ管理
- *  @author     Ryusei Shimizu
- *  @date       2026/10/13
+ *  @file			stage_manager.h
+ *  @brief			ステージ管理
+ *  @author			Ryusei Shimizu
+ *  @date			2026/10/13
  */
 
 #pragma once

@@ -7,6 +7,7 @@
  */
 
 #include "pause.h"
+#include "../../../scene_manager.h"
 
  /*
   *	コンストラクタ
@@ -34,6 +35,8 @@ void
 CPause::
 Update (void)
 {
+	if(vivid::keyboard::Trigger (vivid::keyboard::KEY_ID::X))
+		CSceneManager::GetInstance ().ChangeSubScene (SUB_SCENE_ID::NONE);
 }
 
 /*

@@ -169,6 +169,7 @@
     <ClCompile Include="src\game\game_object\character_manager\character\component\movement\movement_component.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\component\physics\physics_component.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\player\player.cpp" />
+    <ClCompile Include="src\game\game_object\character_manager\character\player\player_input\player_input.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character_manager.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene\main_scene\game_main\game_main.cpp" />
     <ClCompile Include="src\game\game_object\scene_manager\scene\main_scene\result\result.cpp" />
@@ -196,12 +197,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\game.h" />
-    <ClInclude Include="src\game\game_object\character_manager\character\charater.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\character.h" />
     <ClInclude Include="src\game\game_object\character_manager\character\component\component_object.h" />
     <ClInclude Include="src\game\game_object\character_manager\character\component\movement\movement_component.h" />
     <ClInclude Include="src\game\game_object\character_manager\character\component\physics\physics_component.h" />
-    <ClInclude Include="src\game\game_object\character_manager\character\component\physics\vector.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\component\physics\velocity.h" />
     <ClInclude Include="src\game\game_object\character_manager\character\player\player.h" />
+    <ClInclude Include="src\game\game_object\character_manager\character\player\player_input\player_input.h" />
     <ClInclude Include="src\game\game_object\character_manager\character_manager.h" />
     <ClInclude Include="src\game\game_object\game_object.h" />
     <ClInclude Include="src\game\game_object\scene_manager\scene\main_scene\game_main\game_main.h" />

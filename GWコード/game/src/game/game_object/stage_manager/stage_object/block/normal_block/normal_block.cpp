@@ -32,7 +32,7 @@ CNormalBlock::
 Initialize(void)
 {
     // 読み込み範囲指定
-    m_Rect.left = m_default_size;
+    m_Rect.left = 0;
     m_Rect.top = 0;
     m_Rect.right = m_Rect.left + m_default_size;
     m_Rect.bottom = m_default_size;
