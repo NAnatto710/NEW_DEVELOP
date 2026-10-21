@@ -165,6 +165,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\game\game.cpp" />
+    <ClCompile Include="src\game\game_object\camera_manager\camera_manager.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\character.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\component\movement\movement_component.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\component\physics\physics_component.cpp" />
@@ -197,6 +198,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\game.h" />
+    <ClInclude Include="src\game\game_object\camera_manager\camera_manager.h" />
     <ClInclude Include="src\game\game_object\character_manager\character\character.h" />
     <ClInclude Include="src\game\game_object\character_manager\character\component\component_object.h" />
     <ClInclude Include="src\game\game_object\character_manager\character\component\movement\movement_component.h" />
