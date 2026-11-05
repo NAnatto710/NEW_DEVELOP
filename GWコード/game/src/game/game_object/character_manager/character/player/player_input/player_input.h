@@ -8,11 +8,11 @@
 
 #pragma once
 
-// 入力データ。将来の敵AIも同じ形式を出力できる。
+// 入力データ
 struct CharacterMoveInput
 {
-    float Direction = 0.0f;
-    bool JumpPressed = false;
+    float   Direction   = 0.0f;     //!< 方向
+    bool    JumpPressed = false;    //!< ジャンプ
 };
 
 class CPlayerInput

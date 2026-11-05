@@ -69,8 +69,147 @@ namespace Utility
     };
 
 
+    /*!
+     *  @brief  当たり判定結果
+     * 
+     *  Normalは第1引数から第2引数へ向かう押し戻し方向の基準軸
+     *  第1引数を離す場合は Normal * PenetrationDepth を引く
+     */
+    struct CollisionResult
+    {
+        bool            IsHit               = false;                //!< 接触しているか
+        vivid::Vector2  Normal              = vivid::Vector2::ZERO; //!< 第1引数から第2引数方向の単位法線
+        float           PenetrationDepth    = 0.0f;                 //!< めり込み解消に必要な移動距離
+        bool            HasSeparation       = false;                //!< 法線とめり込み量が計算可能か
+    };
+
     namespace Collision
     {
+        /*!
+         *  @brief  詳細な当たり判定結果を取得する
+         *  面積を持つCircle / AABB / OBB同士は押し戻し情報も返す
+         *  それ以外の組み合わせはHit判定のみ（HasSeparation = false）
+         */
+        CollisionResult Check(const Segment& a, const Segment& b);
+        CollisionResult Check(const Segment& a, const Circle& b);
+        CollisionResult Check(const Segment& a, const Capsule& b);
+        CollisionResult Check(const Segment& a, const AABB& b);
+        CollisionResult Check(const Segment& a, const OBB& b);
+        CollisionResult Check(const Circle& a, const Circle& b);
+        CollisionResult Check(const Circle& a, const Capsule& b);
+        CollisionResult Check(const Circle& a, const AABB& b);
+        CollisionResult Check(const Circle& a, const OBB& b);
+        CollisionResult Check(const Capsule& a, const Capsule& b);
+        CollisionResult Check(const Capsule& a, const AABB& b);
+        CollisionResult Check(const Capsule& a, const OBB& b);
+        CollisionResult Check(const AABB& a, const AABB& b);
+        CollisionResult Check(const AABB& a, const OBB& b);
+        CollisionResult Check(const OBB& a, const OBB& b);
+
+        /*!
+         *  @brief  引数の順番を入れ替える補助オーバーロード
+         */
+        inline CollisionResult Check(const Circle& a, const Segment& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const Capsule& a, const Segment& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const AABB& a, const Segment& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const OBB& a, const Segment& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const Capsule& a, const Circle& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const AABB& a, const Circle& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const OBB& a, const Circle& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const AABB& a, const Capsule& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const OBB& a, const Capsule& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+        inline CollisionResult Check(const OBB& a, const AABB& b)
+        {
+            CollisionResult result = Check(b, a);
+            if (result.HasSeparation)
+            {
+                result.Normal.x = -result.Normal.x;
+                result.Normal.y = -result.Normal.y;
+            }
+            return result;
+        }
+
         /*!
          *  @brief  Pointと各形状の当たり判定
          */

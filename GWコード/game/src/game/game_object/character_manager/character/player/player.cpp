@@ -28,8 +28,10 @@ CPlayer::
 Update(void)
 {
     const CharacterMoveInput input = m_Input.GetInput ();
+
     m_Movement.Update (input.Direction, input.JumpPressed, m_Physics);
     m_Physics.Update ();
+
     m_CachedPosition = m_Physics.GetPosition ();
 }
 
@@ -42,5 +44,6 @@ Draw(void)
 {
     // 仮描画：画像・カメラを接続する前の当たり判定確認用
     const auto pos = m_Physics.GetPosition ();
+
     vivid::DrawTexture("data\\character\\player.png",pos);
 }

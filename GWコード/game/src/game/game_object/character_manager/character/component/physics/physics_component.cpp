@@ -1,17 +1,19 @@
 
 /*!
- *  @file   physics_component.cpp
- *  @brief  キャラクター用物理演算コンポーネント
+ *  @file           physics_component.cpp
+ *  @brief          キャラクター用物理演算コンポーネント
+ *  @author         Ryusei Shimizu
+ *  @date           2026/10/13
  */
 
 #include "physics_component.h"
 #include "../../../../stage_manager/stage_manager.h"
 #include "../../../../../../utility/utility.h"
 
-const float CPhysicsComponent::m_friction           = 0.9f;     //!< 摩擦
-const float CPhysicsComponent::m_gravity_increase   = 0.08f;    //!< 重力加算値
-const float CPhysicsComponent::m_max_gravity        = 1.8f;     //!< 最大重力値
-const float CPhysicsComponent::m_max_fallspeed      = 20.0f;    //!< 最大落下速度
+const float CPhysicsComponent::m_friction           =  0.9f;    //!< 摩擦
+const float CPhysicsComponent::m_gravity_increase   =  0.09f;   //!< 重力加算値
+const float CPhysicsComponent::m_max_gravity        =  1.2f;    //!< 最大重力値
+const float CPhysicsComponent::m_max_fallspeed      = 15.0f;    //!< 最大落下速度
 
 /*
  *  初期化
@@ -51,8 +53,10 @@ Update (void)
 
     m_IsGrounded = HasGroundBelow ();
 
+    // 地面についていて重力が加算されていたら
     if(m_IsGrounded && m_Velocity.Gravity.y > 0.0f)
     {
+        // 垂直方向の速度リセット
         ResetVerticalVelocity ();
     }
 }
@@ -72,11 +76,9 @@ ApplyGravity (void)
     }
 
     m_GravityPower += m_gravity_increase;
-
     m_GravityPower = Utility::Min(m_GravityPower,m_max_gravity);
 
     m_Velocity.Gravity.y += m_GravityPower;
-
     m_Velocity.Gravity.y = Utility::Min (m_Velocity.Gravity.y, m_max_fallspeed);
 }
 

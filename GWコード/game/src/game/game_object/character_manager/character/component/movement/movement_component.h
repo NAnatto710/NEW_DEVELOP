@@ -51,10 +51,10 @@ private:
 
 private:
     
-    static const float m_MoveSpeed;         //!< 移動速度
-    static const float m_Acceleration;      //!< 加速度
-    static const float m_Deceleration;      //!< 減速度
-    static const float m_JumpPower;         //!< ジャンプ力
+    static const float  m_move_speed;       //!< 移動速度
+    static const float  m_acceleration;     //!< 加速度
+    static const float  m_deceleration;     //!< 減速度
+    static const float  m_jump_power;       //!< ジャンプ力
 
-    float m_CurrentSpeed;           //!< 現在の速度
+    float               m_CurrentSpeed;     //!< 現在の速度
 };

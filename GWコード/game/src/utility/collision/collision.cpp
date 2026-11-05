@@ -102,10 +102,12 @@ namespace
         const float y2 = aabb.Position.y + aabb.Height;
 
         Bounds bounds;
+
         bounds.Left = Utility::Min(aabb.Position.x, x2);
         bounds.Top = Utility::Min(aabb.Position.y, y2);
         bounds.Right = Utility::Max(aabb.Position.x, x2);
         bounds.Bottom = Utility::Max(aabb.Position.y, y2);
+        
         return bounds;
     }
 
@@ -357,12 +359,284 @@ namespace
 
         return true;
     }
+
+    /*
+     *  めり込み情報が計算できない形状の判定結果を作る
+     */
+    Utility::CollisionResult
+    HitOnly(bool hit)
+    {
+        Utility::CollisionResult result;
+        result.IsHit = hit;
+        return result;
+    }
+
+    /*
+     *  押し戻し可能な衝突結果を作る
+     *  Normalは第1引数から第2引数へ向ける
+     */
+    Utility::CollisionResult
+    MakeContact(const Vec2& normal, float depth)
+    {
+        Utility::CollisionResult result;
+        result.IsHit = true;
+        result.Normal = normal;
+        result.PenetrationDepth = Utility::Max(0.0f, depth);
+        result.HasSeparation = true;
+        return result;
+    }
+
+    /*
+     *  AABBの中心と半サイズを求める
+     */
+    Utility::OBB
+    ToOBB(const Utility::AABB& aabb)
+    {
+        const Bounds bounds = GetBounds(aabb);
+        return Utility::OBB
+        {
+            Vec2((bounds.Left + bounds.Right) * 0.5f, (bounds.Top + bounds.Bottom) * 0.5f),
+            Vec2((bounds.Right - bounds.Left) * 0.5f, (bounds.Bottom - bounds.Top) * 0.5f),
+            0.0f
+        };
+    }
+
+    /*
+     *  SATの軸ごとに分離に必要な移動距離を比較する
+     *  片方がもう片方を包む場合も正しく最短の脱出距離を求める
+     */
+    Utility::CollisionResult
+    RectangleContact(const Utility::OBB& a, const Utility::OBB& b)
+    {
+        Vec2 cornersA[4];
+        Vec2 cornersB[4];
+        GetOBBCorners(a, cornersA);
+        GetOBBCorners(b, cornersB);
+
+        const float ca = std::cos(a.Rotation);
+        const float sa = std::sin(a.Rotation);
+        const float cb = std::cos(b.Rotation);
+        const float sb = std::sin(b.Rotation);
+        const Vec2 axes[4]
+        {
+            Vec2(ca, sa), Vec2(-sa, ca),
+            Vec2(cb, sb), Vec2(-sb, cb)
+        };
+
+        float bestDepth = 3.402823466e+38f;
+        Vec2 bestNormal(0.0f, 0.0f);
+
+        for (int i = 0; i < 4; ++i)
+        {
+            float minA, maxA, minB, maxB;
+            Project(cornersA, axes[i], minA, maxA);
+            Project(cornersB, axes[i], minB, maxB);
+
+            if (maxA < minB - Utility::EPSILON || maxB < minA - Utility::EPSILON)
+                return Utility::CollisionResult{};
+
+            const float moveLeft = maxA - minB;
+            const float moveRight = maxB - minA;
+            const float depth = Utility::Max(0.0f, Utility::Min(moveLeft, moveRight));
+            const Vec2 normal = moveLeft <= moveRight ? axes[i] : Mul(axes[i], -1.0f);
+
+            if (depth < bestDepth)
+            {
+                bestDepth = depth;
+                bestNormal = normal;
+            }
+        }
+
+        return MakeContact(bestNormal, bestDepth);
+    }
+
+    /*
+     *  円を矩形のローカル空間で判定して、押し戻し情報を求める
+     */
+    Utility::CollisionResult
+    CircleRectangleContact(const Utility::Circle& circle, const Utility::OBB& obb)
+    {
+        const Vec2 local = ToOBBLocal(circle.Center, obb);
+        const float halfX = std::fabs(obb.HalfSize.x);
+        const float halfY = std::fabs(obb.HalfSize.y);
+        const float radius = Radius(circle.Radius);
+        const Vec2 nearest(Utility::Clamp(local.x, -halfX, halfX),
+                           Utility::Clamp(local.y, -halfY, halfY));
+        const Vec2 delta = Sub(nearest, local);
+        const float distSq = Dot(delta, delta);
+
+        if (distSq > radius * radius) return Utility::CollisionResult{};
+
+        Vec2 normal;
+        float depth;
+        if (distSq > Utility::EPSILON * Utility::EPSILON)
+        {
+            const float dist = std::sqrt(distSq);
+            normal = Mul(delta, 1.0f / dist);
+            depth = radius - dist;
+        }
+        else
+        {
+            // 円の中心が矩形内にある場合は最も近い辺へ押し出す
+            const float dx = halfX - std::fabs(local.x);
+            const float dy = halfY - std::fabs(local.y);
+            if (dx <= dy)
+            {
+                normal = Vec2(local.x >= 0.0f ? -1.0f : 1.0f, 0.0f);
+                depth = dx + radius;
+            }
+            else
+            {
+                normal = Vec2(0.0f, local.y >= 0.0f ? -1.0f : 1.0f);
+                depth = dy + radius;
+            }
+        }
+
+        return MakeContact(Rotate(normal, obb.Rotation), depth);
+    }
+
+
 }
 
 namespace Utility
 {
     namespace Collision
     {
+        /*
+         *  円と円の衝突情報
+         */
+        CollisionResult
+        Check(const Circle& a, const Circle& b)
+        {
+            const Vec2 delta = Sub(b.Center, a.Center);
+            const float distanceSq = Dot(delta, delta);
+            const float radius = Radius(a.Radius) + Radius(b.Radius);
+            if (distanceSq > radius * radius) return CollisionResult{};
+
+            if (distanceSq <= EPSILON * EPSILON)
+                return MakeContact(Vec2(1.0f, 0.0f), radius);
+
+            const float distance = std::sqrt(distanceSq);
+            return MakeContact(Mul(delta, 1.0f / distance), radius - distance);
+        }
+
+        /*
+         *  円と矩形の衝突情報
+         */
+        CollisionResult
+        Check(const Circle& circle, const AABB& aabb)
+        {
+            return CircleRectangleContact(circle, ToOBB(aabb));
+        }
+
+        CollisionResult
+        Check(const Circle& circle, const OBB& obb)
+        {
+            return CircleRectangleContact(circle, obb);
+        }
+
+        /*
+         *  矩形同士の衝突情報
+         */
+        CollisionResult
+        Check(const AABB& a, const AABB& b)
+        {
+            return RectangleContact(ToOBB(a), ToOBB(b));
+        }
+
+        CollisionResult
+        Check(const AABB& aabb, const OBB& obb)
+        {
+            return RectangleContact(ToOBB(aabb), obb);
+        }
+
+        CollisionResult
+        Check(const OBB& a, const OBB& b)
+        {
+            return RectangleContact(a, b);
+        }
+
+        /*
+         *  SegmentとSegmentの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Segment& a, const Segment& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  SegmentとCircleの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Segment& a, const Circle& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  SegmentとCapsuleの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Segment& a, const Capsule& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  SegmentとAABBの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Segment& a, const AABB& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  SegmentとOBBの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Segment& a, const OBB& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  CircleとCapsuleの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Circle& a, const Capsule& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  CapsuleとCapsuleの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Capsule& a, const Capsule& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  CapsuleとAABBの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Capsule& a, const AABB& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
+        /*
+         *  CapsuleとOBBの接触情報（押し戻し情報は未対応）
+         */
+        CollisionResult
+        Check(const Capsule& a, const OBB& b)
+        {
+            return HitOnly(Hit(a, b));
+        }
+
         /*
          *  点と点
          */
