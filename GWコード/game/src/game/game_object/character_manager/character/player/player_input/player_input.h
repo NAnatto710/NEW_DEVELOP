@@ -8,7 +8,9 @@
 
 #pragma once
 
-// 入力データ
+/*
+ *  入力データ
+ */
 struct CharacterMoveInput
 {
     float   Direction   = 0.0f;     //!< 方向

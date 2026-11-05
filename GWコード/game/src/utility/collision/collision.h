@@ -71,24 +71,27 @@ namespace Utility
 
     /*!
      *  @brief  当たり判定結果
-     * 
-     *  Normalは第1引数から第2引数へ向かう押し戻し方向の基準軸
-     *  第1引数を離す場合は Normal * PenetrationDepth を引く
+     *  Normalは1つ目の形状から2つ目の形状へ向かう方向
+     *  1つ目を離す場合は Normal * PenetrationDepth を引く
+     *  当たっていても、形によっては向きや接触位置を求められない場合がある
      */
     struct CollisionResult
     {
-        bool            IsHit               = false;                //!< 接触しているか
-        vivid::Vector2  Normal              = vivid::Vector2::ZERO; //!< 第1引数から第2引数方向の単位法線
-        float           PenetrationDepth    = 0.0f;                 //!< めり込み解消に必要な移動距離
-        bool            HasSeparation       = false;                //!< 法線とめり込み量が計算可能か
+        bool            IsHit = false;                          //!< 接触しているか
+        vivid::Vector2  Normal = vivid::Vector2(0.0f, 0.0f);    //!< 1つ目から2つ目へ向かう方向
+        float           PenetrationDepth = 0.0f;                //!< 重なっている部分を離すのに必要な距離
+        bool            HasSeparation = false;                 //!< 方向と重なりの深さが使えるか
+        vivid::Vector2  ContactPoint = vivid::Vector2(0.0f, 0.0f); //!< 当たった場所の目安
+        bool            HasContactPoint = false;               //!< 当たった場所が使えるか
     };
 
     namespace Collision
     {
         /*!
          *  @brief  詳細な当たり判定結果を取得する
-         *  面積を持つCircle / AABB / OBB同士は押し戻し情報も返す
-         *  それ以外の組み合わせはHit判定のみ（HasSeparation = false）
+         *  当たったかどうかに加えて、重なりの向き・深さ・場所も調べる
+         *  形によっては当たったかどうかだけを返す
+         *  詳しい情報を使う前にHasSeparation / HasContactPointを確認する
          */
         CollisionResult Check(const Segment& a, const Segment& b);
         CollisionResult Check(const Segment& a, const Circle& b);
@@ -111,6 +114,7 @@ namespace Utility
          */
         inline CollisionResult Check(const Circle& a, const Segment& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -121,6 +125,7 @@ namespace Utility
         }
         inline CollisionResult Check(const Capsule& a, const Segment& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -131,6 +136,7 @@ namespace Utility
         }
         inline CollisionResult Check(const AABB& a, const Segment& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -141,6 +147,7 @@ namespace Utility
         }
         inline CollisionResult Check(const OBB& a, const Segment& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -151,6 +158,7 @@ namespace Utility
         }
         inline CollisionResult Check(const Capsule& a, const Circle& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -161,6 +169,7 @@ namespace Utility
         }
         inline CollisionResult Check(const AABB& a, const Circle& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -171,6 +180,7 @@ namespace Utility
         }
         inline CollisionResult Check(const OBB& a, const Circle& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -181,6 +191,7 @@ namespace Utility
         }
         inline CollisionResult Check(const AABB& a, const Capsule& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -191,6 +202,7 @@ namespace Utility
         }
         inline CollisionResult Check(const OBB& a, const Capsule& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {
@@ -201,6 +213,7 @@ namespace Utility
         }
         inline CollisionResult Check(const OBB& a, const AABB& b)
         {
+            // 逆順で調べた結果を、引数の順番に合わせ直す
             CollisionResult result = Check(b, a);
             if (result.HasSeparation)
             {

@@ -16,8 +16,8 @@
  */
 struct VelocityInfo
 {
-    vivid::Vector2 Move = { 0.0f, 0.0f };
-    vivid::Vector2 Gravity = { 0.0f, 0.0f };
+    vivid::Vector2 Move     = { 0.0f, 0.0f };
+    vivid::Vector2 Gravity  = { 0.0f, 0.0f };
 
     /*!
      *  @brief  最終的な速度を取得する

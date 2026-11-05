@@ -53,7 +53,7 @@ public:
 	 *
 	 *  @return		プレイヤー（未生成時はnullptr）
 	 */
-	CPlayer* GetPlayer (void);
+	CPlayer*		GetPlayer (void);
 
 	/*!
 	 *  @brief		プレイヤー取得

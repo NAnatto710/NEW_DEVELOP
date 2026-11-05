@@ -166,7 +166,6 @@
   <ItemGroup>
     <ClCompile Include="src\game\game.cpp" />
     <ClCompile Include="src\game\game_object\camera_manager\camera_manager.cpp" />
-    <ClCompile Include="src\game\game_object\character_manager\character\character.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\component\movement\movement_component.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\component\physics\physics_component.cpp" />
     <ClCompile Include="src\game\game_object\character_manager\character\player\player.cpp" />
@@ -183,6 +182,9 @@
     <ClCompile Include="src\game\game_object\stage_manager\stage_manager.cpp" />
     <ClCompile Include="src\game\game_object\stage_manager\stage_object\block\normal_block\normal_block.cpp" />
     <ClCompile Include="src\game\game_object\stage_manager\stage_object\stage_object.cpp" />
+    <ClCompile Include="src\game\game_object\stationery_manager\stationery\ruler\ruler.cpp" />
+    <ClCompile Include="src\game\game_object\stationery_manager\stationery\stationery.cpp" />
+    <ClCompile Include="src\game\game_object\stationery_manager\stationery_manager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\utility\utility.cpp" />
     <ClCompile Include="src\utility\collision\collision.cpp" />
@@ -223,6 +225,9 @@
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\normal_block\normal_block.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object_id.h" />
+    <ClInclude Include="src\game\game_object\stationery_manager\stationery\ruler\ruler.h" />
+    <ClInclude Include="src\game\game_object\stationery_manager\stationery\stationery.h" />
+    <ClInclude Include="src\game\game_object\stationery_manager\stationery_manager.h" />
     <ClInclude Include="src\utility\utility.h" />
     <ClInclude Include="src\utility\collision\collision.h" />
     <ClInclude Include="src\utility\csv\csv.h" />
