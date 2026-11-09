@@ -1,4 +1,4 @@
-
+﻿
 /*!
  *  @file			game_object.h
  *  @brief			ゲームオブジェクト
@@ -10,3 +10,4 @@
 
 #include "stage_manager/stage_manager.h"
 #include "character_manager/character_manager.h"
+#include "stationery_manager/stationery_manager.h"

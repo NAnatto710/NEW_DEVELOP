@@ -1,5 +1,4 @@
-﻿
-/*!
+﻿/*!
  *  @file           ruler.h
  *  @brief          定規
  *  @date           2026/11/05
@@ -9,6 +8,12 @@
 
 #include "../stationery.h"
 
+/*!
+ *  @brief          定規クラス
+ *
+ *  文房具共通基底を継承する。
+ *  この段階では画像描画と回転表示のみ扱う。
+ */
 class CRuler final
     : public IStationery
 {

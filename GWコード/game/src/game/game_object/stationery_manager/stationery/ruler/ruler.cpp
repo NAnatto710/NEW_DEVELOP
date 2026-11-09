@@ -1,5 +1,4 @@
-﻿
-/*!
+﻿/*!
  *  @file           ruler.cpp
  *  @brief          定規
  *  @date           2026/11/05

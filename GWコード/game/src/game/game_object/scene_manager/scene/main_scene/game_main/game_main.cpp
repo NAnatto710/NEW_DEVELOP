@@ -1,4 +1,4 @@
-
+﻿
 /*!
  *  @file			game_main.h
  *  @brief			ゲームメインシーン
@@ -9,6 +9,7 @@
 #include "game_main.h"
 #include "../../../scene_manager.h"
 #include "../../../../game_object.h"
+#include "../../../../stationery_manager/stationery/ruler/ruler.h"
 
 /*
  *	コンストラクタ
@@ -28,6 +29,15 @@ Initialize (void)
 {
 	CStageManager::GetInstance ().Initialize();
 	CCharacterManager::GetInstance ().Initialize({100.0f, 100.0f}, 64, 64);
+
+	// 文房具管理の初期化と、表示確認用定規の生成
+	CStationeryManager::GetInstance().Initialize();
+	CRuler* ruler = CStationeryManager::GetInstance().CreateRuler({400.0f, 240.0f});
+	if (ruler)
+	{
+		ruler->SetRotation(0.35f);
+		ruler->Place();
+	}
 }
 
 /*
@@ -39,6 +49,7 @@ Update (void)
 {
 	CStageManager::GetInstance ().Update();
 	CCharacterManager::GetInstance ().Update ();
+	CStationeryManager::GetInstance().Update();
 
 	if (vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::Z))
 		CSceneManager::GetInstance().ChangeMainScene(MAIN_SCENE_ID::RESULT);
@@ -54,6 +65,7 @@ CGameMain::
 Draw (void)
 {
 	CStageManager::GetInstance ().Draw();
+	CStationeryManager::GetInstance().Draw();
 	CCharacterManager::GetInstance ().Draw ();
 
 	IScene::Draw();
@@ -68,4 +80,5 @@ Finalize (void)
 {
 	CStageManager::GetInstance ().Finalize();
 	CCharacterManager::GetInstance ().Finalize ();
+	CStationeryManager::GetInstance().Finalize();
 }

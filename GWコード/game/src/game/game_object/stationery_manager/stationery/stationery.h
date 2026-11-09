@@ -1,8 +1,6 @@
-﻿
-/*!
+﻿/*!
  *  @file           stationery.h
  *  @brief          文房具共通基底
- *  @author         Ryusei Shimizu
  *  @date           2026/11/05
  */
 
@@ -31,6 +29,12 @@ enum class STATIONERY_STATE
     USED            //!< プレイヤー接触済み
 };
 
+/*!
+ *  @brief          文房具共通基底クラス
+ *
+ *  座標は中心座標、回転角はラジアンで管理する。
+ *  使用済みでも、物理演算による位置・回転の更新は許可する。
+ */
 class IStationery
 {
 public:
@@ -53,7 +57,8 @@ public:
      *  @param[in]  position    中心座標
      *  @param[in]  size        幅・高さ
      */
-    virtual void    Initialize(const vivid::Vector2& position, const vivid::Vector2& size);
+    virtual void    Initialize(const vivid::Vector2& position,
+                               const vivid::Vector2& size);
 
     /*!
      *  @brief      更新
@@ -83,7 +88,6 @@ public:
      *  @brief      プレイヤー操作による位置変更
      *
      *  @param[in]  position    中心座標
-     * 
      *  @return     変更できた場合true
      */
     bool            SetPosition(const vivid::Vector2& position);
@@ -92,15 +96,12 @@ public:
      *  @brief      プレイヤー操作による回転変更
      *
      *  @param[in]  rotation    回転角（ラジアン）
-     * 
      *  @return     変更できた場合true
      */
     bool            SetRotation(float rotation);
 
     /*!
      *  @brief      プレイヤーが操作可能か
-     * 
-     *  @return     可能かどうか
      */
     bool            CanManipulate(void) const;
 
@@ -114,17 +115,23 @@ protected:
 
     /*!
      *  @brief      物理演算から位置を更新する
+     *
+     *  USED状態でも更新可能。プレイヤー操作には使用しないこと。
      */
     void            SetPhysicsPosition(const vivid::Vector2& position);
 
     /*!
      *  @brief      物理演算から回転を更新する
+     *
+     *  USED状態でも更新可能。プレイヤー操作には使用しないこと。
      */
     void            SetPhysicsRotation(float rotation);
 
+protected:
+
     const STATIONERY_TYPE   m_Type;         //!< 文房具の種類
     STATIONERY_STATE        m_State;        //!< 配置・使用状態
-    vivid::Vector2          m_Position;     //!< 中心座標
-    vivid::Vector2          m_Size;         //!< 幅・高さ
-    float                   m_Rotation;     //!< 回転角（ラジアン）
+    vivid::Vector2         m_Position;     //!< 中心座標
+    vivid::Vector2         m_Size;         //!< 幅・高さ
+    float                  m_Rotation;     //!< 回転角（ラジアン）
 };

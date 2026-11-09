@@ -1,8 +1,6 @@
-﻿
-/*!
+﻿/*!
  *  @file           stationery.cpp
  *  @brief          文房具共通基底
- *  @author         Ryusei Shimizu
  *  @date           2026/11/05
  */
 
