@@ -7,6 +7,7 @@
 #pragma once
 
 #include "vivid.h"
+#include "../../../utility/collision/collision.h"
 
 #include <memory>
 #include <vector>
@@ -67,6 +68,19 @@ public:
     std::size_t     GetCount(void) const;
 
     /*!
+     *  @brief      配置済み文房具との衝突を調べる
+     *
+     *  @param[in]  player      プレイヤーのAABB（左上座標）
+     *  @param[out] result      衝突結果
+     *  @param[out] stationery 衝突した文房具（所有権は移動しない）
+     *  @return     詳細な衝突が得られた場合true
+     */
+    bool            CheckCollision(const Utility::AABB& player,
+                                   Utility::CollisionResult& result,
+                                   IStationery*& stationery) const;
+
+
+    /*!
      *  @brief      定規をカーソルで掴んでいるか
      */
     bool            IsDragging(void) const;
@@ -77,6 +91,13 @@ private:
      *  @brief      マウスによる文房具操作
      */
     void            UpdateMouse(void);
+
+    /*!
+     *  @brief      文房具同士の衝突を解決する
+     *
+     *  地形衝突後に実行する。ドラッグ中の文房具は対象外。
+     */
+    void            ResolveStationeryPairs(void);
 
     /*!
      *  @brief      指定座標にある文房具を調べる

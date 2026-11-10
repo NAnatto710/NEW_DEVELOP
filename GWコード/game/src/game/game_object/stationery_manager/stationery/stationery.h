@@ -37,6 +37,7 @@ enum class STATIONERY_STATE
  */
 class IStationery
 {
+    friend class CStationeryManager;
 public:
 
     /*!
@@ -69,6 +70,22 @@ public:
      *  @brief      描画
      */
     virtual void    Draw(void) = 0;
+
+    /*!
+     *  @brief      配置済み文房具の物理更新
+     *
+     *  ドラッグ中はManager側で呼び出さない。
+     *  落下・地形衝突に加え、簡易回転と接地摩擦を扱う。
+     */
+    void            UpdatePhysics(void);
+
+    /*!
+     *  @brief      物理速度の初期化
+     *
+     *  掴み直した際に落下速度が残らないようにする。
+     */
+    void            ResetPhysicsVelocity(void);
+
 
     /*!
      *  @brief      配置確定
@@ -134,4 +151,10 @@ protected:
     vivid::Vector2         m_Position;     //!< 中心座標
     vivid::Vector2         m_Size;         //!< 幅・高さ
     float                  m_Rotation;     //!< 回転角（ラジアン）
+    vivid::Vector2         m_PhysicsVelocity; //!< 文房具の物理速度
+    float                  m_PhysicsAngularVelocity = 0.0f; //!< 角速度（ラジアン/フレーム）
+    int                    m_PhysicsStillFrames = 0; //!< 静止判定の連続フレーム数
+    bool                   m_IsPhysicsSleeping = false; //!< 物理更新の休止状態
+    bool                   m_IsPhysicsGrounded = false; //!< 地形への接地状態
+
 };

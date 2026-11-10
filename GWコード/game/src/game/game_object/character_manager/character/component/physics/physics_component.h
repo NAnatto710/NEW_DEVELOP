@@ -1,4 +1,4 @@
-
+﻿
 /*!
  *  @file           physics_component.h
  *  @brief          キャラクター用物理演算コンポーネント
@@ -110,6 +110,31 @@ private:
      *  @return     判定
      */
     bool            IsBlocked (const vivid::Vector2& position) const;
+
+    /*!
+     *  @brief      文房具に重なっている場合、衝突解消を試みる
+     *
+     *  @param[in,out] position  補正するプレイヤー左上座標
+     *  @param[in]     horizontal X軸移動中か
+     *  @return       補正できた場合true（衝突がない場合もtrue）
+     */
+    bool            ResolveStationery(vivid::Vector2& position,
+                                      bool horizontal);
+
+    /*!
+     *  @brief      配置された文房具の上に立っているか
+     */
+    bool            HasStationeryBelow(void) const;
+
+    /*!
+     *  @brief      接地中の定規に沿ったY移動量を取得する
+     *
+     *  @param[in]  horizontalMove  X方向の移動量
+     *  @param[out] slopeMoveY      斜面に沿ったY方向の移動量
+     *  @return     斜面接地中ならtrue
+     */
+    bool            GetStationerySlopeMove(float horizontalMove,
+                                           float& slopeMoveY) const;
 
     /*!
      *  @brief      接地判定

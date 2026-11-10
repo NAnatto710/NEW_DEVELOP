@@ -32,12 +32,6 @@ Initialize (void)
 
 	// 文房具管理の初期化と、表示確認用定規の生成
 	CStationeryManager::GetInstance().Initialize();
-	CRuler* ruler = CStationeryManager::GetInstance().CreateRuler({400.0f, 240.0f});
-	if (ruler)
-	{
-		ruler->SetRotation(0.35f);
-		ruler->Place();
-	}
 }
 
 /*
@@ -48,8 +42,20 @@ CGameMain::
 Update (void)
 {
 	CStageManager::GetInstance ().Update();
-	CCharacterManager::GetInstance ().Update ();
+	// マウス操作を反映してからプレイヤーの衝突を更新する
 	CStationeryManager::GetInstance().Update();
+	CCharacterManager::GetInstance ().Update ();
+
+	if (vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::Q))
+	{
+		CRuler* ruler = CStationeryManager::GetInstance().CreateRuler({ 400.0f, 240.0f });
+
+		if (ruler)
+		{
+			ruler->SetRotation(0.0f);
+			ruler->Place();
+		}
+	}
 
 	if (vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::Z))
 		CSceneManager::GetInstance().ChangeMainScene(MAIN_SCENE_ID::RESULT);
