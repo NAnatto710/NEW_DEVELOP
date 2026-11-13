@@ -7,6 +7,7 @@
 #pragma once
 
 #include "vivid.h"
+#include "stationery_controller.h"
 #include "../../../utility/collision/collision.h"
 
 #include <memory>
@@ -88,42 +89,13 @@ public:
 private:
 
     /*!
-     *  @brief      マウスによる文房具操作
-     */
-    void            UpdateMouse(void);
-
-    /*!
      *  @brief      文房具同士の衝突を解決する
      *
      *  地形衝突後に実行する。ドラッグ中の文房具は対象外。
      */
     void            ResolveStationeryPairs(void);
 
-    /*!
-     *  @brief      指定座標にある文房具を調べる
-     *
-     *  @param[in]  position    判定位置（画面座標・暫定）
-     *  @return     操作可能な文房具（見つからなければnullptr）
-     */
-    IStationery*    FindStationery(const vivid::Vector2& position) const;
-
-    /*!
-     *  @brief      文房具の回転矩形に点が含まれるか
-     */
-    bool            ContainsPoint(const IStationery& stationery,
-                                 const vivid::Vector2& position) const;
-
-    /*!
-     *  @brief      マウス操作を中止して操作前の値へ戻す
-     */
-    void            CancelDrag(void);
-
-private:
-
-    IStationery*            m_Dragging = nullptr;     //!< 操作中の文房具（所有しない）
-    vivid::Vector2         m_DragOffset;             //!< 掴んだ位置と中心の差
-    vivid::Vector2         m_StartPosition;          //!< 操作開始前の位置
-    float                  m_StartRotation = 0.0f;   //!< 操作開始前の回転角
+    CStationeryController   m_Controller;             //!< 文房具のマウス操作
 
     std::vector<std::unique_ptr<IStationery>> m_Stationeries; //!< 文房具一覧
 

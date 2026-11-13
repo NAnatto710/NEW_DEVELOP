@@ -47,14 +47,14 @@ void
 CStationeryManager::
 Update(void)
 {
-    UpdateMouse();
+    m_Controller.Update(m_Stationeries);
 
     for (const auto& stationery : m_Stationeries)
     {
         stationery->Update();
 
         // ドラッグ中は移動と回転をユーザーの操作に任せる
-        if (stationery.get() != m_Dragging)
+        if (!m_Controller.IsDragging(stationery.get()))
         {
             stationery->UpdatePhysics();
         }
@@ -85,7 +85,7 @@ CStationeryManager::
 Finalize(void)
 {
     // 選択中のポインタが解放済みオブジェクトを指さないようにする
-    m_Dragging = nullptr;
+    m_Controller.Reset();
     m_Stationeries.clear();
 }
 
@@ -123,154 +123,7 @@ bool
 CStationeryManager::
 IsDragging(void) const
 {
-    return m_Dragging != nullptr;
-}
-
-/*
- *  マウス入力による文房具操作
- */
-void
-CStationeryManager::
-UpdateMouse(void)
-{
-    const vivid::Point cursor = vivid::mouse::GetCursorPos();
-    const vivid::Vector2 mouse_position = {
-        static_cast<float>(cursor.x),
-        static_cast<float>(cursor.y)
-    };
-
-    // 右クリックで操作開始前の位置・角度へ戻す
-    if (m_Dragging != nullptr &&
-        vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::RIGHT))
-    {
-        CancelDrag();
-        return;
-    }
-
-    // 未使用の文房具を左クリックで掴む
-    if (m_Dragging == nullptr &&
-        vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::LEFT))
-    {
-        m_Dragging = FindStationery(mouse_position);
-
-        if (m_Dragging != nullptr)
-        {
-            // 掴んだ瞬間に落下速度を破棄する
-            m_Dragging->ResetPhysicsVelocity();
-            m_StartPosition = m_Dragging->GetPosition();
-            m_StartRotation = m_Dragging->GetRotation();
-            m_DragOffset = {
-                m_StartPosition.x - mouse_position.x,
-                m_StartPosition.y - mouse_position.y
-            };
-        }
-    }
-
-    if (m_Dragging == nullptr)
-    {
-        return;
-    }
-
-    // 別システムでUSEDになった場合は操作を停止する
-    if (!m_Dragging->CanManipulate())
-    {
-        m_Dragging = nullptr;
-        return;
-    }
-
-    // マウスで掴んだ点を維持して移動する
-    if (vivid::mouse::Button(vivid::mouse::BUTTON_ID::LEFT))
-    {
-        m_Dragging->SetPosition({
-            mouse_position.x + m_DragOffset.x,
-            mouse_position.y + m_DragOffset.y
-        });
-
-        // 回転角はラジアン。ホイール1単位で5度回転する（仮値）
-        constexpr float ROTATION_STEP = 0.0872664626f;
-        const int wheel = vivid::mouse::GetWheel();
-
-        if (wheel != 0)
-        {
-            m_Dragging->SetRotation(
-                m_Dragging->GetRotation() + ROTATION_STEP * wheel);
-        }
-    }
-
-    // ボタンを離したらその場所に配置する
-    if (vivid::mouse::Released(vivid::mouse::BUTTON_ID::LEFT))
-    {
-        if (m_Dragging->GetState() == STATIONERY_STATE::HELD)
-        {
-            m_Dragging->Place();
-        }
-
-        m_Dragging = nullptr;
-    }
-}
-
-/*
- *  クリック位置から文房具を検索
- */
-IStationery*
-CStationeryManager::
-FindStationery(const vivid::Vector2& position) const
-{
-    // 最後に描画した文房具を優先して選択する
-    for (auto it = m_Stationeries.rbegin(); it != m_Stationeries.rend(); ++it)
-    {
-        IStationery* stationery = it->get();
-
-        if (stationery->CanManipulate() &&
-            ContainsPoint(*stationery, position))
-        {
-            return stationery;
-        }
-    }
-
-    return nullptr;
-}
-
-/*
- *  回転矩形によるクリック判定
- */
-bool
-CStationeryManager::
-ContainsPoint(const IStationery& stationery,
-              const vivid::Vector2& position) const
-{
-    const vivid::Vector2& center = stationery.GetPosition();
-    const vivid::Vector2& size = stationery.GetSize();
-    const float rotation = stationery.GetRotation();
-
-    // マウス座標を定規のローカル座標へ逆回転させる
-    const float dx = position.x - center.x;
-    const float dy = position.y - center.y;
-    const float cosine = std::cos(rotation);
-    const float sine = std::sin(rotation);
-    const float local_x = dx * cosine + dy * sine;
-    const float local_y = -dx * sine + dy * cosine;
-
-    return std::abs(local_x) <= size.x * 0.5f &&
-           std::abs(local_y) <= size.y * 0.5f;
-}
-
-/*
- *  文房具操作のキャンセル
- */
-void
-CStationeryManager::
-CancelDrag(void)
-{
-    if (m_Dragging == nullptr)
-    {
-        return;
-    }
-
-    // 配置済みの文房具は掴む直前の座標へ戻す
-    m_Dragging->SetPosition(m_StartPosition);
-    m_Dragging->SetRotation(m_StartRotation);
-    m_Dragging = nullptr;
+    return m_Controller.IsDragging();
 }
 
 /*
@@ -292,7 +145,7 @@ CheckCollision(const Utility::AABB& player,
 
         // 配置前およびマウスで移動中の文房具は衝突対象外
         if (target->GetState() == STATIONERY_STATE::HELD ||
-            target == m_Dragging)
+            m_Controller.IsDragging(target))
         {
             continue;
         }
@@ -435,12 +288,12 @@ ResolveStationeryPairs(void)
         for (std::size_t i = 0; i < m_Stationeries.size(); ++i)
         {
             IStationery* a = m_Stationeries[i].get();
-            if (a == m_Dragging || a->GetState() == STATIONERY_STATE::HELD) continue;
+            if (m_Controller.IsDragging(a) || a->GetState() == STATIONERY_STATE::HELD) continue;
 
             for (std::size_t j = i + 1; j < m_Stationeries.size(); ++j)
             {
                 IStationery* b = m_Stationeries[j].get();
-                if (b == m_Dragging || b->GetState() == STATIONERY_STATE::HELD) continue;
+                if (m_Controller.IsDragging(b) || b->GetState() == STATIONERY_STATE::HELD) continue;
 
                 const Utility::OBB box_a = {
                     a->m_Position, {a->m_Size.x * 0.5f, a->m_Size.y * 0.5f}, a->m_Rotation

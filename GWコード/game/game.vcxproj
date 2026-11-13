@@ -185,6 +185,7 @@
     <ClCompile Include="src\game\game_object\stationery_manager\stationery\ruler\ruler.cpp" />
     <ClCompile Include="src\game\game_object\stationery_manager\stationery\stationery.cpp" />
     <ClCompile Include="src\game\game_object\stationery_manager\stationery_manager.cpp" />
+    <ClCompile Include="src\game\game_object\stationery_manager\stationery_controller.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\utility\utility.cpp" />
     <ClCompile Include="src\utility\collision\collision.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="src\game\game_object\stationery_manager\stationery\ruler\ruler.h" />
     <ClInclude Include="src\game\game_object\stationery_manager\stationery\stationery.h" />
     <ClInclude Include="src\game\game_object\stationery_manager\stationery_manager.h" />
+    <ClInclude Include="src\game\game_object\stationery_manager\stationery_controller.h" />
     <ClInclude Include="src\utility\utility.h" />
     <ClInclude Include="src\utility\collision\collision.h" />
     <ClInclude Include="src\utility\csv\csv.h" />

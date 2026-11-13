@@ -1,0 +1,172 @@
+[7036:20092:1110/162253.033:WARNING:chrome_main_delegate.cc(745)] This is Chrome version 128.0.6613.138 (not a warning)
+[7036:11324:1110/162253.108:ERROR:google_update_settings.cc(265)] Failed opening key Software\Chromium to set usagestats; result: 5
+[7036:20092:1110/162253.141:WARNING:account_consistency_mode_manager.cc(77)] Desktop Identity Consistency cannot be enabled as no OAuth client ID and client secret have been configured.
+[20192:18980:1110/162300.503:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162300.520:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162300.534:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162300.546:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162301.222:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162301.228:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162301.382:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162301.394:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162301.431:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162301.438:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162302.072:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162302.080:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162302.736:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162302.743:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162302.765:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162302.773:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162303.532:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162303.538:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[17516:17864:1110/162303.945:WARNING:frame_impl.cc(430)] virtual CefFrameImpl::SendProcessMessage sent to detached frame 5-E1F27D904126482AC2E4ABE8D8AE7578 will be ignored
+[20192:18980:1110/162304.702:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162304.713:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162304.961:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162304.967:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[9708:10704:1110/162305.075:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[9708:456:1110/162305.099:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[9708:456:1110/162305.099:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[9708:456:1110/162305.100:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[20192:18980:1110/162305.282:WARNING:host_resolver_dns_task.cc(863)] Address list empty after RFC3484 sort
+[20192:18980:1110/162305.286:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.cloudflare.com., errorcode: -105
+[20192:18980:1110/162305.286:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.cloudflare.com., errorcode: -105
+[20192:18980:1110/162305.286:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.cloudflare.com., errorcode: -105
+[9708:456:1110/162305.287:WARNING:stun_port.cc(442)] Port[15e4c00:0:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[9708:456:1110/162305.287:WARNING:stun_port.cc(442)] Port[15e5c00:1:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[9708:456:1110/162305.287:WARNING:stun_port.cc(442)] Port[15e6400:2:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[20192:18980:1110/162305.287:WARNING:host_resolver_dns_task.cc(863)] Address list empty after RFC3484 sort
+[20192:18980:1110/162305.289:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
+[20192:18980:1110/162305.289:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
+[20192:18980:1110/162305.289:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
+[9708:456:1110/162305.289:WARNING:stun_port.cc(442)] Port[15e4c00:0:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[9708:456:1110/162305.289:WARNING:stun_port.cc(442)] Port[15e5c00:1:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[9708:456:1110/162305.289:WARNING:stun_port.cc(442)] Port[15e6400:2:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[20192:18980:1110/162305.290:WARNING:host_resolver_dns_task.cc(863)] Address list empty after RFC3484 sort
+[20192:18980:1110/162305.290:ERROR:socket_manager.cc(147)] Failed to resolve address for stun1.l.google.com., errorcode: -105
+[20192:18980:1110/162305.290:ERROR:socket_manager.cc(147)] Failed to resolve address for stun1.l.google.com., errorcode: -105
+[20192:18980:1110/162305.290:ERROR:socket_manager.cc(147)] Failed to resolve address for stun1.l.google.com., errorcode: -105
+[9708:456:1110/162305.290:WARNING:stun_port.cc(442)] Port[15e4c00:0:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[9708:456:1110/162305.290:WARNING:stun_port.cc(442)] Port[15e5c00:1:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[9708:456:1110/162305.292:WARNING:stun_port.cc(442)] Port[15e6400:2:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[20192:18980:1110/162305.373:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162305.378:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[7036:18936:1110/162305.948:WARNING:browser_info.cc(345)] Returning a speculative frame for [8,9]
+[7036:20092:1110/162306.278:WARNING:browser_info.cc(345)] Returning a speculative frame for [9,9]
+[7036:20092:1110/162306.278:WARNING:browser_info.cc(345)] Returning a speculative frame for [9,9]
+[7036:20092:1110/162306.278:WARNING:browser_info.cc(345)] Returning a speculative frame for [9,9]
+[7036:20092:1110/162306.278:WARNING:browser_info.cc(345)] Returning a speculative frame for [9,9]
+[7036:18936:1110/162306.285:WARNING:browser_info.cc(345)] Returning a speculative frame for [9,9]
+[16948:17232:1110/162307.608:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[16948:15936:1110/162307.654:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[16948:15936:1110/162307.654:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[16948:15936:1110/162307.654:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[20192:18980:1110/162307.867:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162307.874:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162307.947:WARNING:host_resolver_dns_task.cc(863)] Address list empty after RFC3484 sort
+[20192:18980:1110/162307.947:WARNING:host_resolver_dns_task.cc(863)] Address list empty after RFC3484 sort
+[20192:18980:1110/162307.947:WARNING:host_resolver_dns_task.cc(863)] Address list empty after RFC3484 sort
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun1.l.google.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun1.l.google.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun1.l.google.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.cloudflare.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.cloudflare.com., errorcode: -105
+[20192:18980:1110/162307.947:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.cloudflare.com., errorcode: -105
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2040400:0:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2041400:1:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2041c00:2:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2040400:0:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2041400:1:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2041c00:2:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2040400:0:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2041400:1:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[16948:15936:1110/162307.950:WARNING:stun_port.cc(442)] Port[2041c00:2:1:0:host:Net[any:0:0:0:x:x:x:x:x/0:Wildcard:id=0]]: StunPort: stun host lookup received error -1
+[20192:18980:1110/162308.134:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162308.139:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162308.288:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162308.294:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[16948:17232:1110/162312.059:WARNING:codec.cc(525)] Explicitly added H264 constrained baseline to list of supported formats.
+[20192:18980:1110/162312.397:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162312.403:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162312.920:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162312.926:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162313.123:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162313.130:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162319.474:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162319.480:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162319.880:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162319.895:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162320.403:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162320.411:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162328.867:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162328.873:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162330.326:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162330.331:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162331.153:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162331.159:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162344.242:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162344.292:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162345.842:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162345.847:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162346.514:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162346.519:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162408.382:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162408.382:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162408.387:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162408.388:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162408.927:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162408.934:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162440.601:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162440.607:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162441.013:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162441.020:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162441.965:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162441.972:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[2016:9172:1110/162517.130:ERROR:shared_image_manager.cc(224)] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[2016:9172:1110/162517.130:ERROR:shared_image_manager.cc(224)] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[20192:18980:1110/162528.349:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162528.357:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162532.713:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162532.719:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162536.841:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162536.847:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162643.424:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162643.431:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162643.527:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162643.533:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162702.905:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162702.911:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162839.874:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162839.880:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162844.800:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162844.808:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162911.286:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/162911.292:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163125.055:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163125.061:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163133.496:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163133.505:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163220.950:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163220.957:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163535.748:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163535.754:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163558.213:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163558.219:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163702.308:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/163702.316:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/164214.917:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/164214.924:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/164221.076:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/164221.091:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/164323.430:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/164323.435:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/165144.826:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/165144.834:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/165253.133:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/165253.140:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/165353.237:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[20192:18980:1110/165353.242:ERROR:ssl_client_socket_impl.cc(882)] handshake failed; returned -1, SSL error code 1, net_error -101
+[7036:20092:1110/170134.681:WARNING:pref_notifier_impl.cc(41)] Pref observer for media_router.cast_allow_all_ips found at shutdown.

@@ -1,0 +1,22 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0.0",
+  "FriendlyName": "LGT Collision Tool",
+  "Description": "Bakes Landscape Grass Tool instances into invisible collision-only HISM components for editor-authored levels.",
+  "Category": "Editor",
+  "CreatedBy": "OpenAI",
+  "CanContainContent": false,
+  "IsBetaVersion": true,
+  "Installed": false,
+  "SupportedTargetPlatforms": [
+    "Win64"
+  ],
+  "Modules": [
+    {
+      "Name": "LGTCollisionTool",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
