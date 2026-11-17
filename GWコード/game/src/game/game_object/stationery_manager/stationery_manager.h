@@ -1,7 +1,7 @@
 ﻿/*!
- *  @file           stationery_manager.h
- *  @brief          文房具管理
- *  @date           2026/11/05
+ *  @file  stationery_manager.h
+ *  @brief  文房具管理
+ *  @date  2026/11/05
  */
 
 #pragma once
@@ -10,6 +10,7 @@
 #include "stationery_controller.h"
 #include "../../../utility/collision/collision.h"
 
+#include <array>
 #include <memory>
 #include <vector>
 
@@ -17,7 +18,7 @@ class IStationery;
 class CRuler;
 
 /*!
- *  @brief          文房具の生成・更新・描画・解放を管理する
+ *  @brief  文房具の生成・更新・描画・解放を管理する
  *
  *  生成した文房具の所有権は本クラスが持つ。
  *  外部へ返すポインタはFinalize後には使用できない。
@@ -80,13 +81,30 @@ public:
                                    Utility::CollisionResult& result,
                                    IStationery*& stationery) const;
 
-
     /*!
      *  @brief      定規をカーソルで掴んでいるか
      */
     bool            IsDragging(void) const;
 
 private:
+
+    // 地形衝突と同様、文房具同士の衝突計算用補助処理はクラス内で管理する。
+    /*! @brief  法線から摩擦方向の接線を取得する */
+    static vivid::Vector2 PairPerp(const vivid::Vector2& vector);
+
+    /*! @brief  文房具の回転矩形をワールド座標の4頂点へ変換する */
+    static std::array<vivid::Vector2, 4> GetPairCorners(const IStationery& item);
+
+    /*! @brief  接触方向へ最も張り出した頂点（辺の場合は中心）を取得する */
+    static vivid::Vector2 GetPairSupport(const IStationery& item,
+                                          vivid::Vector2 direction);
+
+    // 文房具同士の衝突パラメータ（定義はcpp側にまとめる）。
+    static const float m_pair_contact_slop;
+    static const float m_pair_correction_rate;
+    static const float m_pair_max_correction;
+    static const float m_pair_friction;
+    static const int   m_pair_iterations;
 
     /*!
      *  @brief      文房具同士の衝突を解決する

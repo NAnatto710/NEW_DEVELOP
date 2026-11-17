@@ -5,6 +5,7 @@
  *  @author			Ryusei Shimizu
  *  @date           2026/10/09
  */
+
 #pragma once
 
 #include <vector>

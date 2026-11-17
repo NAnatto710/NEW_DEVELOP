@@ -1,7 +1,7 @@
 ﻿/*!
- *  @file           stationery_controller.h
- *  @brief          文房具のマウス操作
- *  @date           2026/11/10
+ *  @file  stationery_controller.h
+ *  @brief  文房具のマウス操作
+ *  @date  2026/11/10
  */
 
 #pragma once
@@ -14,7 +14,7 @@
 class IStationery;
 
 /*!
- *  @brief          文房具の選択・ドラッグ・回転を担当する
+ *  @brief  文房具の選択・ドラッグ・回転を担当する
  *
  *  文房具の所有権は持たない。文房具の削除前にResetを呼ぶ。
  *  既存の画面座標操作を維持し、カメラ座標変換は後で対応する。
@@ -46,6 +46,8 @@ public:
     bool            IsDragging(void) const;
 
 private:
+
+    static const float m_rotation_step; //!< ホイール1目盛りあたりの回転角（5度、ラジアン）
 
     /*!
      *  @brief      指定位置にある操作可能な文房具を探す

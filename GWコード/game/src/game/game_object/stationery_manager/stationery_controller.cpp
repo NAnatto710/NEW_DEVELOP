@@ -1,13 +1,15 @@
 ﻿/*!
- *  @file           stationery_controller.cpp
- *  @brief          文房具のマウス操作
- *  @date           2026/11/10
+ *  @file  stationery_controller.cpp
+ *  @brief  文房具のマウス操作
+ *  @date  2026/11/10
  */
 
 #include "stationery_controller.h"
 #include "stationery/stationery.h"
 
 #include <cmath>
+
+const float CStationeryController::m_rotation_step = 0.0872664626f;
 
 /*
  *  マウス入力による文房具操作の更新
@@ -16,7 +18,9 @@ void
 CStationeryController::
 Update(const std::vector<std::unique_ptr<IStationery>>& stationeries)
 {
+    // vividのマウス座標を文房具が使用する浮動小数点の座標へ変換する
     const vivid::Point cursor = vivid::mouse::GetCursorPos();
+    // マウス位置を取得し、選択・移動の判定基準にする。
     const vivid::Vector2 mouse_position = {
         static_cast<float>(cursor.x),
         static_cast<float>(cursor.y)
@@ -70,13 +74,12 @@ Update(const std::vector<std::unique_ptr<IStationery>>& stationeries)
         });
 
         // 回転角はラジアン。ホイール1単位で5度回転する（仮値）
-        constexpr float ROTATION_STEP = 0.0872664626f;
         const int wheel = vivid::mouse::GetWheel();
 
         if (wheel != 0)
         {
             m_Dragging->SetRotation(
-                m_Dragging->GetRotation() + ROTATION_STEP * wheel);
+                m_Dragging->GetRotation() + m_rotation_step * wheel);
         }
     }
 
@@ -127,7 +130,7 @@ ContainsPoint(const IStationery& stationery,
     const vivid::Vector2& size = stationery.GetSize();
     const float rotation = stationery.GetRotation();
 
-    // マウス座標を定規のローカル座標へ逆回転させる
+    // 判定対象の回転を打ち消し、ローカル座標で幅・高さを比較する
     const float dx = position.x - center.x;
     const float dy = position.y - center.y;
     const float cosine = std::cos(rotation);

@@ -46,21 +46,13 @@ Update(void)
 {
     if (m_Width <= 0 || m_Height <= 0) return;
 
-    // 上昇中は接地判定でジャンプ状態を上書きしない
-    if (m_Velocity.Gravity.y < 0.0f)
-        m_IsGrounded = false;
-    else
-        m_IsGrounded = HasGroundBelow();
+    m_IsGrounded = HasGroundBelow();
 
     ApplyGravity();
 
     CheckCollision();
 
-    // 上昇中は接地扱いにしない
-    if (m_Velocity.Gravity.y < 0.0f)
-        m_IsGrounded = false;
-    else
-        m_IsGrounded = HasGroundBelow();
+    m_IsGrounded = HasGroundBelow();
 
     if (m_IsGrounded && m_Velocity.Gravity.y > 0.0f)
     {
@@ -405,13 +397,46 @@ MoveAxis (float delta, bool horizontal)
         if(horizontal)  next.x += step;
         else            next.y += step;
 
-        if(!ResolveStationery(next, horizontal) || IsBlocked(next))
+        // 配置された文房具と最初から重なっている場合、押し戻し先が
+        // 地形で塞がれても、重なりを減らす方向への移動なら脱出を許可する。
+        // 通常時は従来どおり衝突解決後の座標だけを採用する。
+        const vivid::Vector2 requested = next;
+        const bool resolved = ResolveStationery(next, horizontal);
+        if (!resolved)
         {
-            if(horizontal) 
-                m_Velocity.Move.x = 0.0f;
+            const CStationeryManager& manager = CStationeryManager::GetInstance();
+            Utility::CollisionResult before_hit;
+            Utility::CollisionResult after_hit;
+            IStationery* before_item = nullptr;
+            IStationery* after_item = nullptr;
+            const Utility::AABB before_box = {
+                m_Position, static_cast<float>(m_Width), static_cast<float>(m_Height)
+            };
+            const Utility::AABB after_box = {
+                requested, static_cast<float>(m_Width), static_cast<float>(m_Height)
+            };
+            const bool before = manager.CheckCollision(before_box, before_hit, before_item);
+            const bool after = manager.CheckCollision(after_box, after_hit, after_item);
+            // 深い重なりを増やさず、かつ地形と衝突しない場合だけ移動できる。
+            // すでに重なっている状態が解消されるまで、1pxずつ脱出可能。
+            if (before && !IsBlocked(requested) &&
+                (!after || after_hit.PenetrationDepth < before_hit.PenetrationDepth - 0.0001f))
+            {
+                next = requested;
+                if (after_item != nullptr) after_item->MarkUsed();
+                if (before_item != nullptr) before_item->MarkUsed();
+            }
             else
-                this->ResetVerticalVelocity();
-
+            {
+                if (horizontal) m_Velocity.Move.x = 0.0f;
+                else ResetVerticalVelocity();
+                return;
+            }
+        }
+        if (IsBlocked(next))
+        {
+            if (horizontal) m_Velocity.Move.x = 0.0f;
+            else ResetVerticalVelocity();
             return;
         }
 

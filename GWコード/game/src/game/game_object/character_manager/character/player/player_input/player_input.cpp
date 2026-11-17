@@ -18,8 +18,11 @@ GetInput (void) const
 {
     CharacterMoveInput input;
 
-    if(vivid::keyboard::Button (vivid::keyboard::KEY_ID::A)) input.Direction -= 1.0f;
-    if(vivid::keyboard::Button (vivid::keyboard::KEY_ID::D)) input.Direction += 1.0f;
+    if(vivid::keyboard::Button(vivid::keyboard::KEY_ID::D) || vivid::keyboard::Button(vivid::keyboard::KEY_ID::A))
+        input.Direction = vivid::keyboard::Button(vivid::keyboard::KEY_ID::D) - vivid::keyboard::Button(vivid::keyboard::KEY_ID::A);
+
+    if (vivid::keyboard::Button(vivid::keyboard::KEY_ID::RIGHT) || vivid::keyboard::Button(vivid::keyboard::KEY_ID::LEFT))
+        input.Direction = vivid::keyboard::Button(vivid::keyboard::KEY_ID::RIGHT) - vivid::keyboard::Button(vivid::keyboard::KEY_ID::LEFT);
 
     input.JumpPressed = vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::W) ||
                         vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::SPACE);

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "scene_manager/scene_manager.h"
 #include "stage_manager/stage_manager.h"
 #include "character_manager/character_manager.h"
 #include "stationery_manager/stationery_manager.h"

@@ -124,8 +124,8 @@ private:
 	bool            m_ChangeMainScene;          //!< メインシーン変更フラグ
 	bool            m_ChangeSubScene;           //!< サブシーン変更フラグ
 
-	STATE           m_State;                    //!< シーン状態
-	CSceneTransition m_SceneTransition;         //!< シーンエフェクト
+	STATE               m_State;                //!< シーン状態
+	CSceneTransition    m_SceneTransition;      //!< シーンエフェクト
 
 	// 以下コンストラクタ類の削除
     CSceneManager(void) = default;

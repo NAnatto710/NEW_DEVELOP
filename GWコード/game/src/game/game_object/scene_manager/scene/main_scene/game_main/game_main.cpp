@@ -7,7 +7,6 @@
  */
 
 #include "game_main.h"
-#include "../../../scene_manager.h"
 #include "../../../../game_object.h"
 #include "../../../../stationery_manager/stationery/ruler/ruler.h"
 

@@ -1,17 +1,18 @@
-﻿/*!
- *  @file           ruler.cpp
- *  @brief          定規
- *  @date           2026/11/05
- */
+﻿
+/*!
+  *  @file           ruler.cpp
+  *  @brief          定規
+  *  @author         Ryusei Shimizu
+  *  @date           2026/11/05
+  */
 
 #include "ruler.h"
 
 #include <string>
 
-namespace
-{
-    const std::string RULER_TEXTURE_PATH = "data\\stationery\\ruler.png";
-}
+const int           CRuler::m_texture_width     = 300;                              //!< 画像の幅
+const int           CRuler::m_texture_height    = 50;                               //!< 画像の高さ
+const std::string   CRuler::m_texture_path      = "data\\stationery\\ruler.png";    //!< 画像パス
 
 /*
  *  コンストラクタ
@@ -30,9 +31,7 @@ CRuler::
 Initialize(const vivid::Vector2& position)
 {
     // 基底クラスで中心座標とサイズ、配置状態を初期化する
-    IStationery::Initialize(
-        position,
-        {static_cast<float>(TEXTURE_WIDTH), static_cast<float>(TEXTURE_HEIGHT)});
+    IStationery::Initialize(position, {static_cast<float>(m_texture_width), static_cast<float>(m_texture_height)});
 }
 
 /*
@@ -42,7 +41,6 @@ void
 CRuler::
 Update(void)
 {
-    // マウス操作・物理処理は今後追加する
 }
 
 /*
@@ -52,30 +50,11 @@ void
 CRuler::
 Draw(void)
 {
-    // vivid2DのDrawTextureは、position + anchorを回転中心として扱う
-    // 基底クラスの中心座標を渡すため、画像半分を引いておく
-    const vivid::Vector2 anchor = {
-        TEXTURE_WIDTH * 0.5f,
-        TEXTURE_HEIGHT * 0.5f
-    };
-
-    const vivid::Vector2 draw_position = {
-        m_Position.x - anchor.x,
-        m_Position.y - anchor.y
-    };
-
-    const vivid::Rect rect = {
-        0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT
-    };
-
+    const vivid::Vector2 anchor = { m_texture_width * 0.5f, m_texture_height * 0.5f};
+    const vivid::Rect rect = { 0, 0, m_texture_width, m_texture_height};
     const vivid::Vector2 scale = {1.0f, 1.0f};
 
-    vivid::DrawTexture(
-        RULER_TEXTURE_PATH,
-        draw_position,
-        0xffffffff,
-        rect,
-        anchor,
-        scale,
-        m_Rotation);
+    const vivid::Vector2 draw_position = { m_Position.x - anchor.x, m_Position.y - anchor.y};
+
+    vivid::DrawTexture( m_texture_path, draw_position, 0xffffffff, rect, anchor, scale, m_Rotation);
 }

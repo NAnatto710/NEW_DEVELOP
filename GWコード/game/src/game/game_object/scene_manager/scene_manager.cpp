@@ -1,9 +1,11 @@
-﻿/*!
+﻿
+/*!
  *  @file           scene_manager.cpp
  *  @brief          シーン管理
  *  @author			Ryusei Shimizu
  *  @date           2026/10/09
  */
+
 #include "scene_manager.h"
 #include "scene/scene_object.h"
 
@@ -70,6 +72,7 @@ Draw(void)
 	// メインシーンとサブシーンの描画
     if (m_MainScene)
         m_MainScene->Draw();
+
     if (m_SubScene)
         m_SubScene->Draw();
 }
@@ -171,7 +174,7 @@ CreateSubScene(SUB_SCENE_ID id)
 }
 
 /*
- *  フェードイン（中央から外周へ黒タイルを消す）
+ *  フェードイン
  */
 void
 CSceneManager::
@@ -212,7 +215,7 @@ SceneUpdate(void)
 }
 
 /*
- *  フェードアウト（外周から中央へ黒タイルを表示）
+ *  フェードアウト
  */
 void
 CSceneManager::
