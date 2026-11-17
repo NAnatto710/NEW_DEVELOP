@@ -29,7 +29,7 @@ public:
      *  @param[in]  jumpPressed ジャンプ入力
      *  @param[in]  physics     物理演算コンポーネント
      */
-    void Update (float direction, bool jumpPressed, CPhysicsComponent& physics);
+    void            Update (float direction, bool jumpPressed, CPhysicsComponent& physics);
 
 private:
     
@@ -39,7 +39,7 @@ private:
      *  @param[in]  direction   方向
      *  @param[in]  physics     物理演算コンポーネント
      */
-    void Move (float direction, CPhysicsComponent& physics);
+    void            Move (float direction, CPhysicsComponent& physics);
 
     /*!
      *  @brief      ジャンプ
@@ -47,7 +47,7 @@ private:
      *  @param[in]  jumpPressed ジャンプ入力
      *  @param[in]  physics     物理演算コンポーネント
      */
-    void Jump (bool jumpPressed, CPhysicsComponent& physics);
+    void            Jump (bool jumpPressed, CPhysicsComponent& physics);
 
 private:
     

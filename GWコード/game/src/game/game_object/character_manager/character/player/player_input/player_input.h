@@ -1,7 +1,7 @@
 
 /*!
  *  @file           player_input.h
- *  @brief          プレイヤー
+ *  @brief          プレイヤー入力
  *  @author         Ryusei Shimizu
  *  @date           2026/10/16
  */

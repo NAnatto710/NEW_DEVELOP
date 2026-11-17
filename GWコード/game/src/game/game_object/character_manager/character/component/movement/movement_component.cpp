@@ -20,7 +20,7 @@ const float CMovementComponent::m_jump_power    = 12.0f;    //!< ジャンプ力
  */
 void
 CMovementComponent::
-Initialize (void)
+Initialize(void)
 {
     m_CurrentSpeed = 0.0f;
 }
@@ -30,13 +30,13 @@ Initialize (void)
  */
 void
 CMovementComponent::
-Update (float direction, bool jumpPressed, CPhysicsComponent& physics)
+Update(float direction, bool jumpPressed, CPhysicsComponent& physics)
 {
     // 移動入力
-    this->Move (direction, physics);
+    this->Move(direction, physics);
 
     // ジャンプ入力
-    this->Jump (jumpPressed, physics);
+    this->Jump(jumpPressed, physics);
 }
 
 /*
@@ -44,10 +44,11 @@ Update (float direction, bool jumpPressed, CPhysicsComponent& physics)
  */
 void
 CMovementComponent::
-Move (float direction, CPhysicsComponent& physics)
+Move(float direction, CPhysicsComponent& physics)
 {
     direction = Utility::Clamp(direction, -1.0f, 1.0f);
 
+    // 入力がある
     if(direction != 0.0f)
     {
         // 目標速度
@@ -77,7 +78,7 @@ Move (float direction, CPhysicsComponent& physics)
     }
 
     // Physicsへ水平移動速度を渡す
-    physics.SetMoveVelocity ({m_CurrentSpeed, 0.0f});
+    physics.SetMoveVelocity({m_CurrentSpeed, 0.0f});
 }
 
 /*
@@ -85,14 +86,13 @@ Move (float direction, CPhysicsComponent& physics)
  */
 void
 CMovementComponent::
-Jump (bool jumpPressed, CPhysicsComponent& physics)
+Jump(bool jumpPressed, CPhysicsComponent& physics)
 {
     // キーが押されたとき
     if(!jumpPressed) return;
-
     // 接地中のみジャンプ
-    if(!physics.IsGrounded ()) return;
+    if(!physics.IsGrounded()) return;
 
     // Y軸正方向が下なので負の速度
-    physics.SetVerticalVelocity (-m_jump_power);
+    physics.SetVerticalVelocity(-m_jump_power);
 }

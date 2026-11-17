@@ -21,8 +21,8 @@ GetInput (void) const
     if(vivid::keyboard::Button (vivid::keyboard::KEY_ID::A)) input.Direction -= 1.0f;
     if(vivid::keyboard::Button (vivid::keyboard::KEY_ID::D)) input.Direction += 1.0f;
 
-    input.JumpPressed = vivid::keyboard::Trigger (vivid::keyboard::KEY_ID::W) ||
-                        vivid::keyboard::Trigger (vivid::keyboard::KEY_ID::SPACE);
+    input.JumpPressed = vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::W) ||
+                        vivid::keyboard::Trigger(vivid::keyboard::KEY_ID::SPACE);
 
     return input;
 }

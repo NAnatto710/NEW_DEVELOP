@@ -22,7 +22,7 @@ public:
 	 *
 	 *  @return		インスタンス
 	 */
-	static CCharacterManager& GetInstance (void);
+	static CCharacterManager& GetInstance(void);
 
 	/*!
 	 *  @brief		初期化
@@ -31,44 +31,38 @@ public:
 	 *  @param[in]	width		プレイヤーの横幅
 	 *  @param[in]	height		プレイヤーの縦幅
 	 */
-	void			Initialize (const vivid::Vector2& position, int width, int height);
+	void			Initialize(const vivid::Vector2& position, int width, int height);
 
 	/*!
 	 *  @brief		更新
 	 */
-	void			Update (void);
+	void			Update(void);
 
 	/*!
 	 *  @brief		描画
 	 */
-	void			Draw (void);
+	void			Draw(void);
 
 	/*!
 	 *  @brief		解放
 	 */
-	void			Finalize (void);
+	void			Finalize(void);
 
 	/*!
 	 *  @brief		プレイヤー取得
 	 *
 	 *  @return		プレイヤー（未生成時はnullptr）
 	 */
-	CPlayer*		GetPlayer (void);
-
-	/*!
-	 *  @brief		プレイヤー取得
-	 *
-	 *  @return		プレイヤー（未生成時はnullptr）
-	 */
-	const CPlayer* GetPlayer (void) const;
+	CPlayer*		GetPlayer(void);
+	const CPlayer*	GetPlayer(void) const;
 
 private:
 
 	std::unique_ptr<CPlayer>	m_Player;	//!< プレイヤー
 
 	// 以下コンストラクタ類
-	CCharacterManager (void) = default;
-	~CCharacterManager (void) = default;
-	CCharacterManager (const CCharacterManager& rhs) = delete;
+	CCharacterManager(void) = default;
+	~CCharacterManager(void) = default;
+	CCharacterManager(const CCharacterManager& rhs) = delete;
 	CCharacterManager& operator=(const CCharacterManager& rhs) = delete;
 };

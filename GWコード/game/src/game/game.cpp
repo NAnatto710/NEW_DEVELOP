@@ -1,9 +1,9 @@
 ﻿
 /*!
- *  @file       game.cpp
- *  @brief      ゲーム管理
- *  @author     Ryusei Shimizu
- *  @date       2026/09/16
+ *  @file			game.cpp
+ *  @brief			ゲーム管理
+ *  @author			Ryusei Shimizu
+ *  @date			2026/09/16
  */
 
 #include "game.h"
@@ -24,8 +24,10 @@ GameInitialize(void)
 	Utility::Movie::Init();
 	Utility::Data::Init();
 
+	// セーブデータのロード
 	Utility::Data::Load();
 
+	// シーンの初期化
 	CSceneManager::GetInstance().Initialize();
 }
 
@@ -39,6 +41,7 @@ GameUpdate(void)
 	// Utility更新
 	Utility::Sound::Update();
 
+	// シーンの更新
 	CSceneManager::GetInstance().Update();
 }
 
@@ -49,6 +52,7 @@ void
 CGame::
 GameDraw(void)
 {
+	// シーンの描画（エフェクトと別で描画する）
 	CSceneManager::GetInstance().Draw();
 	CSceneManager::GetInstance().DrawSceneEffect();
 }
@@ -60,7 +64,10 @@ void
 CGame::
 GameFinalize(void)
 {
+	// シーンの解放
 	CSceneManager::GetInstance().Finalize();
+
+	// Utility解放
 	Utility::Sound::Finalize();
 	Utility::Movie::Finalize();
 }

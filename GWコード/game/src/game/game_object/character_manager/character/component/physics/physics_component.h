@@ -114,12 +114,12 @@ private:
     /*!
      *  @brief      文房具に重なっている場合、衝突解消を試みる
      *
-     *  @param[in,out] position  補正するプレイヤー左上座標
-     *  @param[in]     horizontal X軸移動中か
-     *  @return       補正できた場合true（衝突がない場合もtrue）
+     *  @param[in]  position    位置
+     *  @param[in]  horizontal  縦横の区別（trueがX、falseがY）
+     * 
+     *  @return     補正できた場合true（衝突がない場合もtrue）
      */
-    bool            ResolveStationery(vivid::Vector2& position,
-                                      bool horizontal);
+    bool            ResolveStationery(vivid::Vector2& position, bool horizontal);
 
     /*!
      *  @brief      配置された文房具の上に立っているか
@@ -130,11 +130,11 @@ private:
      *  @brief      接地中の定規に沿ったY移動量を取得する
      *
      *  @param[in]  horizontalMove  X方向の移動量
-     *  @param[out] slopeMoveY      斜面に沿ったY方向の移動量
+     *  @param[in]  slopeMoveY      斜面に沿ったY方向の移動量
+     * 
      *  @return     斜面接地中ならtrue
      */
-    bool            GetStationerySlopeMove(float horizontalMove,
-                                           float& slopeMoveY) const;
+    bool            GetStationerySlopeMove(float horizontalMove, float& slopeMoveY) const;
 
     /*!
      *  @brief      接地判定
@@ -151,10 +151,11 @@ private:
      */
     void            MoveAxis (float delta, bool horizontal);
 
-    static const float  m_friction;         //!< 摩擦
-    static const float  m_gravity_increase; //!< 重力加算値
-    static const float  m_max_gravity;      //!< 最大重力値
-    static const float  m_max_fallspeed;    //!< 最大落下速度
+    static const float  m_friction;             //!< 摩擦
+    static const float  m_gravity_increase;     //!< 重力加算値
+    static const float  m_max_gravity;          //!< 最大重力値
+    static const float  m_max_fallspeed;        //!< 最大落下速度
+    static const float  m_min_ground_normal_y;  //!< 文房具を床として認識するためのしきい値
 
     int                 m_Width;            //!< 幅
     int                 m_Height;           //!< 高さ

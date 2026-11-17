@@ -77,12 +77,12 @@ namespace Utility
      */
     struct CollisionResult
     {
-        bool            IsHit = false;                          //!< 接触しているか
-        vivid::Vector2  Normal = vivid::Vector2(0.0f, 0.0f);    //!< 1つ目から2つ目へ向かう方向
-        float           PenetrationDepth = 0.0f;                //!< 重なっている部分を離すのに必要な距離
-        bool            HasSeparation = false;                 //!< 方向と重なりの深さが使えるか
-        vivid::Vector2  ContactPoint = vivid::Vector2(0.0f, 0.0f); //!< 当たった場所の目安
-        bool            HasContactPoint = false;               //!< 当たった場所が使えるか
+        bool            IsHit               = false;                        //!< 接触しているか
+        vivid::Vector2  Normal              = vivid::Vector2(0.0f, 0.0f);   //!< 1つ目から2つ目へ向かう方向
+        float           PenetrationDepth    = 0.0f;                         //!< 重なっている部分を離すのに必要な距離
+        bool            HasSeparation       = false;                        //!< 方向と重なりの深さが使えるか
+        vivid::Vector2  ContactPoint        = vivid::Vector2(0.0f, 0.0f);   //!< 当たった場所の目安
+        bool            HasContactPoint     = false;                        //!< 当たった場所が使えるか
     };
 
     namespace Collision

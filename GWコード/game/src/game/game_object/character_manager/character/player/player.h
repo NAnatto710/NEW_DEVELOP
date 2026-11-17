@@ -35,7 +35,7 @@ public:
 	 *	@param[in]	height		縦幅
 	 *	@param[in]	position	位置
 	 */
-	void			Initialize (int width, int height, const vivid::Vector2& position);
+	void			Initialize(int width, int height, const vivid::Vector2& position);
 
 	/*!
 	 *	@brief		更新
@@ -47,13 +47,14 @@ public:
 	 */
 	void			Draw(void) override;
 
-	const vivid::Vector2& GetPosition (void) const { return m_CachedPosition; }
-
 private:
 
-	vivid::Vector2		m_CachedPosition;
-
+	// プレイヤー入力情報
 	CPlayerInput		m_Input{};
+
+	// 移動制御コンポーネント
 	CMovementComponent	m_Movement{};
+
+	// 物理演算コンポーネント
 	CPhysicsComponent	m_Physics{};
 };

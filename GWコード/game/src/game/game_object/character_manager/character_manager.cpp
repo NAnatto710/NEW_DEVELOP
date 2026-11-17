@@ -16,7 +16,7 @@
  */
 CCharacterManager&
 CCharacterManager::
-GetInstance (void)
+GetInstance(void)
 {
 	static CCharacterManager instance;
 
@@ -28,12 +28,14 @@ GetInstance (void)
  */
 void
 CCharacterManager::
-Initialize (const vivid::Vector2& position, int width, int height)
+Initialize(const vivid::Vector2& position, int width, int height)
 {
-	this->Finalize ();
+	// 念のために解放をする
+	this->Finalize();
 
-	m_Player = std::make_unique<CPlayer> ();
-	m_Player->Initialize (width, height, position);
+	// プレイヤー生成
+	m_Player = std::make_unique<CPlayer>();
+	m_Player->Initialize(width, height, position);
 }
 
 /*
@@ -41,10 +43,9 @@ Initialize (const vivid::Vector2& position, int width, int height)
  */
 void
 CCharacterManager::
-Update (void)
+Update(void)
 {
-	if(m_Player)
-		m_Player->Update ();
+	if(m_Player) m_Player->Update();
 }
 
 /*
@@ -52,10 +53,9 @@ Update (void)
  */
 void
 CCharacterManager::
-Draw (void)
+Draw(void)
 {
-	if(m_Player)
-		m_Player->Draw ();
+	if(m_Player) m_Player->Draw();
 }
 
 /*
@@ -63,9 +63,9 @@ Draw (void)
  */
 void
 CCharacterManager::
-Finalize (void)
+Finalize(void)
 {
-	m_Player.reset ();
+	m_Player.reset();
 }
 
 /*
@@ -73,9 +73,9 @@ Finalize (void)
  */
 CPlayer*
 CCharacterManager::
-GetPlayer (void)
+GetPlayer(void)
 {
-	return m_Player.get ();
+	return m_Player.get();
 }
 
 /*
@@ -83,7 +83,7 @@ GetPlayer (void)
  */
 const CPlayer*
 CCharacterManager::
-GetPlayer (void) const
+GetPlayer(void) const
 {
-	return m_Player.get ();
+	return m_Player.get();
 }

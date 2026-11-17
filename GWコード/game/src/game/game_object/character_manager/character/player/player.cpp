@@ -17,7 +17,6 @@ Initialize (int width, int height, const vivid::Vector2& position)
 {
     m_Movement.Initialize ();
     m_Physics.Initialize (width, height, position);
-    m_CachedPosition = position;
 }
 
 /*
@@ -31,8 +30,6 @@ Update(void)
 
     m_Movement.Update (input.Direction, input.JumpPressed, m_Physics);
     m_Physics.Update ();
-
-    m_CachedPosition = m_Physics.GetPosition ();
 }
 
 /*
@@ -45,5 +42,5 @@ Draw(void)
     // 仮描画：画像・カメラを接続する前の当たり判定確認用
     const auto pos = m_Physics.GetPosition ();
 
-    vivid::DrawTexture("data\\character\\player.png",pos);
+    vivid::DrawTexture("data\\character\\player.png", pos);
 }
