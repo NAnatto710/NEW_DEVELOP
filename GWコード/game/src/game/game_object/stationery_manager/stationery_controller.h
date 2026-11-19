@@ -66,7 +66,6 @@ private:
      */
     void            CancelDrag(void);
 
-private:
 
     IStationery*    m_Dragging = nullptr;      //!< 操作中の文房具（所有しない）
     vivid::Vector2  m_DragOffset{};             //!< マウスと中心座標の差

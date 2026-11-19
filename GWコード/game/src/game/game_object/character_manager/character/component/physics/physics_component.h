@@ -152,8 +152,7 @@ private:
     void            MoveAxis (float delta, bool horizontal);
 
     static const float  m_friction;             //!< 摩擦
-    static const float  m_gravity_increase;     //!< 重力加算値
-    static const float  m_max_gravity;          //!< 最大重力値
+    static const float  m_gravity;              //!< 重力加速度（文房具と同じ値）
     static const float  m_max_fallspeed;        //!< 最大落下速度
     static const float  m_min_ground_normal_y;  //!< 文房具を床として認識するためのしきい値
 
@@ -162,6 +161,5 @@ private:
     vivid::Vector2      m_Position;         //!< 位置
     vivid::Vector2      m_InitialPosition;  //!< 初期位置
     VelocityInfo        m_Velocity{};       //!< 速度
-    float               m_GravityPower;     //!< 重力値
     bool                m_IsGrounded;       //!< 接地フラグ
 };

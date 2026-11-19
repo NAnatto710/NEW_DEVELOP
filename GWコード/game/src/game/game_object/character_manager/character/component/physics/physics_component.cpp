@@ -13,8 +13,7 @@
 #include "../../../../../../utility/utility.h"
 
 const float CPhysicsComponent::m_friction               =  0.9f;    //!< 摩擦
-const float CPhysicsComponent::m_gravity_increase       =  0.09f;   //!< 重力加算値
-const float CPhysicsComponent::m_max_gravity            =  1.2f;    //!< 最大重力値
+const float CPhysicsComponent::m_gravity                =  0.35f;   //!< 重力加速度（文房具と同じ値）
 const float CPhysicsComponent::m_max_fallspeed          = 15.0f;    //!< 最大落下速度
 const float CPhysicsComponent::m_min_ground_normal_y    =  0.5f;    //!< 文房具を床として認識するためのしきい値
 
@@ -33,7 +32,6 @@ Initialize (int width, int height, const vivid::Vector2& position)
 
     m_Velocity.Clear ();
 
-    m_GravityPower = 0.0f;
     m_IsGrounded = false;
 }
 
@@ -75,11 +73,10 @@ ApplyGravity (void)
         return;
     }
 
-    m_GravityPower += m_gravity_increase;
-    m_GravityPower = Utility::Min(m_GravityPower,m_max_gravity);
-
-    m_Velocity.Gravity.y += m_GravityPower;
-    m_Velocity.Gravity.y = Utility::Min (m_Velocity.Gravity.y, m_max_fallspeed);
+    // 文房具と同じ重力値を毎フレーム加える
+    // 文房具側はサブステップで分割するが、1フレーム分の加速度は同じ
+    m_Velocity.Gravity.y = Utility::Min(
+        m_Velocity.Gravity.y + m_gravity, m_max_fallspeed);
 }
 
 /*
@@ -153,7 +150,6 @@ SetVerticalVelocity(float velocity)
 {
     m_Velocity.Move.y = 0.0f;
     m_Velocity.Gravity.y = velocity;
-    m_GravityPower = 0.0f;
     m_IsGrounded = false;
 }
 
@@ -166,8 +162,6 @@ ResetVerticalVelocity(void)
 {
     m_Velocity.Move.y = 0.0f;
     m_Velocity.Gravity.y = 0.0f;
-
-    m_GravityPower = 0.0f;
 }
 
 /*
@@ -178,7 +172,6 @@ CPhysicsComponent::
 ResetVelocity (void)
 {
     m_Velocity.Clear ();
-    m_GravityPower = 0.0f;
 }
 
 /*

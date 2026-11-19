@@ -13,7 +13,7 @@
 const float CMovementComponent::m_move_speed    = 6.0f;     //!< 移動速度
 const float CMovementComponent::m_acceleration  = 1.5f;     //!< 加速度
 const float CMovementComponent::m_deceleration  = 1.2f;     //!< 減速度
-const float CMovementComponent::m_jump_power    = 12.0f;    //!< ジャンプ力
+const float CMovementComponent::m_jump_power    =  9.4f;    //!< ジャンプ力（以前と同程度の到達高度）
 
 /*
  *  初期化

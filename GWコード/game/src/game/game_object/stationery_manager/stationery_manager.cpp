@@ -1,23 +1,26 @@
 ﻿/*!
  *  @file  stationery_manager.cpp
  *  @brief  文房具管理
- *  @date  2026/11/05
+ *  @date  2026/11/19
  */
 
 #include "stationery_manager.h"
 #include "stationery/stationery.h"
 #include "stationery/ruler/ruler.h"
+#include "../stage_manager/stage_manager.h"
 
 #include <cmath>
 #include <array>
+#include <vector>
 #include "../../../utility/utility.h"
 
-// 衝突補正量は従来値を維持する。
-const float CStationeryManager::m_pair_contact_slop      = 0.05f;
-const float CStationeryManager::m_pair_correction_rate   = 0.45f;
-const float CStationeryManager::m_pair_max_correction    = 3.0f;
-const float CStationeryManager::m_pair_friction          = 0.50f;
-const int   CStationeryManager::m_pair_iterations        = 6;
+// 物理の精度を調整する値はここにまとめる。
+const int   CStationeryManager::m_sub_steps           = 6;
+const int   CStationeryManager::m_velocity_iterations = 8;
+const int   CStationeryManager::m_position_iterations = 4;
+const float CStationeryManager::m_friction            = 0.60f;
+const float CStationeryManager::m_contact_slop        = 0.02f;
+const float CStationeryManager::m_position_rate       = 0.65f;
 
 /*
  *  インスタンスの取得
@@ -57,20 +60,47 @@ Update(void)
     // 入力による選択・ドラッグ・配置を先に反映する。
     m_Controller.Update(m_Stationeries);
 
-    // 文房具固有の更新後に、操作されていない物体の物理だけ進める。
+    // ドラッグ中・配置前の文房具を物理の対象から外す。
+    std::vector<IStationery*> active;
+    active.reserve(m_Stationeries.size());
     for (const auto& stationery : m_Stationeries)
     {
         stationery->Update();
-
-        // ドラッグ中は移動と回転をユーザーの操作に任せる
-        if (!m_Controller.IsDragging(stationery.get()))
+        if (stationery->GetState() != STATIONERY_STATE::HELD &&
+            !m_Controller.IsDragging(stationery.get()))
         {
-            stationery->UpdatePhysics();
+            active.push_back(stationery.get());
         }
     }
+    if (active.empty()) return;
 
-    // 地形との物理更新後に文房具同士を解決する
-    ResolveStationeryPairs();
+    // 全文房具を同じ時間ずつ動かし、その都度まとめて衝突を解決する。
+    // 個別に落下させてから文房具同士を押し出すと、床との補正が競合しやすい。
+    const float dt = 1.0f / static_cast<float>(m_sub_steps);
+    std::vector<SContact> contacts;
+    contacts.reserve(active.size() * 8);
+
+    for (int step = 0; step < m_sub_steps; ++step)
+    {
+        // 1. 重力・移動・回転
+        for (IStationery* item : active) item->UpdatePhysics(dt);
+
+        // 2. 地形と文房具同士を同じルールで押し返す。
+        CollectContacts(active, contacts);
+        for (int i = 0; i < m_velocity_iterations; ++i)
+        {
+            for (SContact& contact : contacts) ResolveVelocity(contact);
+        }
+
+        // 3. 速度を変更しても残っているめり込みを解消する。
+        //    位置・角度が変わるため、毎回接触を調べ直す。
+        for (int i = 0; i < m_position_iterations; ++i)
+        {
+            CollectContacts(active, contacts);
+            if (contacts.empty()) break;
+            for (SContact& contact : contacts) ResolvePosition(contact);
+        }
+    }
 }
 
 /*
@@ -199,271 +229,302 @@ CheckCollision(const Utility::AABB& player,
     return stationery != nullptr;
 }
 
-/*!
- *  @brief  接触法線を90度回転し、摩擦計算用の接線を取得する
- *
- *  @param[in]  vector  法線などの元ベクトル
- *  @return  左回りに90度回転したベクトル
+/*
+ *  文房具の矩形コライダーを作成する
+ */
+Utility::OBB
+CStationeryManager::
+GetCollider(const IStationery& item)
+{
+    return Utility::OBB
+    {
+        item.m_Position,
+        vivid::Vector2(item.m_Size.x * 0.5f, item.m_Size.y * 0.5f),
+        item.m_Rotation
+    };
+}
+
+/*
+ *  2つの矩形が実際に重なる領域の中央を接触点として使う。
+ *  角が当たる場合も、足場の端だけで支えられる場合も同じ計算で処理できる。
+ *  最大8頂点になる多角形の切り抜き処理。ヒープ確保は行わない。
  */
 vivid::Vector2
 CStationeryManager::
-PairPerp(const vivid::Vector2& vector)
+GetContactPoint(const Utility::OBB& a, const Utility::OBB& b)
 {
-    return vivid::Vector2(-vector.y, vector.x);
-}
+    const float ca = std::cos(a.Rotation);
+    const float sa = std::sin(a.Rotation);
+    const float cb = std::cos(b.Rotation);
+    const float sb = std::sin(b.Rotation);
 
-/*!
- *  @brief  文房具の回転矩形についてワールド座標の4頂点を求める
- */
-std::array<vivid::Vector2, 4>
-CStationeryManager::
-GetPairCorners(const IStationery& item)
-{
-    const vivid::Vector2& center = item.GetPosition();
-    const vivid::Vector2& size = item.GetSize();
-    const float c = std::cos(item.GetRotation());
-    const float s = std::sin(item.GetRotation());
-    const float hx = size.x * 0.5f;
-    const float hy = size.y * 0.5f;
-    const std::array<vivid::Vector2, 4> local = {{
-        vivid::Vector2(-hx, -hy), vivid::Vector2(hx, -hy),
-        vivid::Vector2(hx, hy), vivid::Vector2(-hx, hy)
+    const vivid::Vector2 ax(ca * a.HalfSize.x, sa * a.HalfSize.x);
+    const vivid::Vector2 ay(-sa * a.HalfSize.y, ca * a.HalfSize.y);
+    const vivid::Vector2 bx(cb * b.HalfSize.x, sb * b.HalfSize.x);
+    const vivid::Vector2 by(-sb * b.HalfSize.y, cb * b.HalfSize.y);
+
+    // 各矩形の頂点を左上から時計回りに並べる（画面のY軸は下向き）。
+    std::array<vivid::Vector2, 16> points =
+    {{
+        a.Center - ax - ay, a.Center + ax - ay,
+        a.Center + ax + ay, a.Center - ax + ay
     }};
-    std::array<vivid::Vector2, 4> result{};
+    const std::array<vivid::Vector2, 4> edges =
+    {{
+        b.Center - bx - by, b.Center + bx - by,
+        b.Center + bx + by, b.Center - bx + by
+    }};
+    int count = 4;
 
-    // ローカル4頂点を中心座標に対して回転させ、ワールド座標へ変換。
-    for (int i = 0; i < 4; ++i)
+    // Bの4辺でAの多角形を切り抜き、重なった領域だけを残す。
+    for (int edge = 0; edge < 4 && count > 0; ++edge)
     {
-        result[i] = vivid::Vector2(
-            center.x + local[i].x * c - local[i].y * s,
-            center.y + local[i].x * s + local[i].y * c);
-    }
-    return result;
-}
+        std::array<vivid::Vector2, 16> next{};
+        int next_count = 0;
+        const vivid::Vector2 start = edges[edge];
+        const vivid::Vector2 direction = edges[(edge + 1) % 4] - start;
+        vivid::Vector2 previous = points[count - 1];
+        float old_side = vivid::Vector2::Cross(direction, previous - start);
 
-/*
- *  向きに最も張り出した頂点を求める
- *  ほぼ同じ投影位置にある頂点は平均して接触辺の中央にする
- */
-vivid::Vector2
-CStationeryManager::
-GetPairSupport(const IStationery& item, vivid::Vector2 direction)
-{
-    const auto corners = GetPairCorners(item);
-    // 指定方向への内積が最大の点が、最も外側にある頂点。
-    float best = vivid::Vector2::Dot(corners[0], direction);
-    for (const vivid::Vector2 corner : corners)
-    {
-        best = Utility::Max(best, vivid::Vector2::Dot(corner, direction));
-    }
-    // ほぼ同じ位置にある辺の2頂点は平均化して接触点を安定させる。
-    vivid::Vector2 sum(0.0f, 0.0f);
-    int count = 0;
-    for (const vivid::Vector2 corner : corners)
-    {
-        if (best - vivid::Vector2::Dot(corner, direction) < 0.5f)
+        for (int i = 0; i < count; ++i)
         {
-            sum = sum + corner;
-            ++count;
+            const vivid::Vector2 current = points[i];
+            const float new_side = vivid::Vector2::Cross(direction, current - start);
+            const bool previous_inside = old_side >= 0.0f;
+            const bool current_inside = new_side >= 0.0f;
+
+            // 辺をまたぐ場合は交点を追加する。
+            if (previous_inside != current_inside)
+            {
+                const float rate = old_side / (old_side - new_side);
+                if (next_count < 16)
+                {
+                    next[next_count++] = previous + (current - previous) * rate;
+                }
+            }
+            if (current_inside && next_count < 16) next[next_count++] = current;
+            previous = current;
+            old_side = new_side;
         }
+        points = next;
+        count = next_count;
     }
-    if (count <= 0) return corners[0];
-    return sum * (1.0f / static_cast<float>(count));
+
+    // 交差の数値誤差で空になったときは中心の中点を使う。
+    if (count == 0) return (a.Center + b.Center) * 0.5f;
+
+    vivid::Vector2 point(0.0f, 0.0f);
+    for (int i = 0; i < count; ++i) point = point + points[i];
+    return point * (1.0f / static_cast<float>(count));
 }
 
 /*
- *  文房具同士の衝突処理
- *  地形の既存ソルバは変更しない。2物体の速度と位置を補正する。
+ *  SATの法線・めり込み量と、実際の重なり位置をまとめる
  */
 void
 CStationeryManager::
-ResolveStationeryPairs(void)
+AddContact(IStationery* a, IStationery* b,
+           const Utility::OBB& box_a, const Utility::OBB& box_b, const Utility::CollisionResult& hit,
+           std::vector<SContact>& contacts)
 {
-    // 接触・摩擦・位置補正の定数はクラス共通定数として宣言済み。
+    if (!hit.IsHit || !hit.HasSeparation || hit.PenetrationDepth <= 0.0f) return;
 
-    // 物体数が2未満なら文房具同士の衝突はない
-    if (m_Stationeries.size() < 2) return;
+    const float length_sq = vivid::Vector2::Dot(hit.Normal, hit.Normal);
+    if (length_sq < 0.5f) return;
 
-    // 速度拘束と位置補正を分離する。
-    // 速度を解決している途中で接触位置を変更すると、同じ接触面の
-    // 法線や作用点が反復ごとに揺れ、回転・滑りが増幅される場合がある。
-    //
-    // 第1段階：速度・角速度・摩擦だけを解決する。
-    // 第2段階：従来と同じ回数と補正量でめり込みだけを解消する。
-    // 位置補正を1回に減らすと沈み込むため、反復回数は維持する。
-    for (int phase = 0; phase < 2; ++phase)
+    SContact contact;
+    contact.A = a;
+    contact.B = b;
+    contact.Normal = hit.Normal * (1.0f / std::sqrt(length_sq));
+    contact.Point = GetContactPoint(box_a, box_b);
+    contact.Depth = hit.PenetrationDepth;
+    contacts.push_back(contact);
+}
+
+/*
+ *  接触する地形と文房具のペアを探す
+ *  高速化のためOBB同士を調べる前に包囲矩形を比較する。
+ */
+void
+CStationeryManager::
+CollectContacts(const std::vector<IStationery*>& active,
+                std::vector<SContact>& contacts) const
+{
+    contacts.clear();
+    const CStageManager& stage = CStageManager::GetInstance();
+    const int block_size = stage.GetBlockSize();
+    if (block_size <= 0) return;
+
+    // 地形との接触。回転後の矩形が占めるタイルだけを調べる。
+    for (IStationery* item : active)
     {
-        const bool solve_velocity = (phase == 0);
-        for (int iteration = 0; iteration < m_pair_iterations; ++iteration)
+        const Utility::OBB box = GetCollider(*item);
+        const float c = std::fabs(std::cos(item->m_Rotation));
+        const float s = std::fabs(std::sin(item->m_Rotation));
+        const float hx = item->m_Size.x * c * 0.5f + item->m_Size.y * s * 0.5f;
+        const float hy = item->m_Size.x * s * 0.5f + item->m_Size.y * c * 0.5f;
+        const int left = static_cast<int>(std::floor((item->m_Position.x - hx) / block_size));
+        const int right = static_cast<int>(std::floor((item->m_Position.x + hx) / block_size));
+        const int top = static_cast<int>(std::floor((item->m_Position.y - hy) / block_size));
+        const int bottom = static_cast<int>(std::floor((item->m_Position.y + hy) / block_size));
+
+        for (int y = top; y <= bottom; ++y)
         {
-            bool has_contact = false;
-            // 同じ組を二重に判定しないよう、i より後ろの要素のみを調べる。
-            for (std::size_t i = 0; i < m_Stationeries.size(); ++i)
+            for (int x = left; x <= right; ++x)
             {
-                IStationery* a = m_Stationeries[i].get();
-                // つかんでいる物体はマウスの位置・角度を優先するため除外する。
-                if (m_Controller.IsDragging(a) || a->GetState() == STATIONERY_STATE::HELD) continue;
+                const int tile_x = x * block_size;
+                const int tile_y = y * block_size;
+                if (!stage.IsHit(tile_x, tile_y)) continue;
 
-                for (std::size_t j = i + 1; j < m_Stationeries.size(); ++j)
+                const Utility::OBB tile =
                 {
-                    IStationery* b = m_Stationeries[j].get();
-                    // もう一方も配置前・ドラッグ中なら衝突による補正を行わない。
-                    if (m_Controller.IsDragging(b) || b->GetState() == STATIONERY_STATE::HELD) continue;
+                    vivid::Vector2(tile_x + block_size * 0.5f,
+                                   tile_y + block_size * 0.5f),
+                    vivid::Vector2(block_size * 0.5f, block_size * 0.5f),
+                    0.0f
+                };
 
-                    // 回転後の包囲AABBで明らかに離れている組を除外する。
-                    // 狭い範囲だけ精密なOBB衝突を行い、非接触ペアの負荷を下げる。
-                    const float ca = std::fabs(std::cos(a->m_Rotation));
-                    const float sa = std::fabs(std::sin(a->m_Rotation));
-                    const float cb = std::fabs(std::cos(b->m_Rotation));
-                    const float sb = std::fabs(std::sin(b->m_Rotation));
-                    const float ax = (a->m_Size.x * ca + a->m_Size.y * sa) * 0.5f;
-                    const float ay = (a->m_Size.x * sa + a->m_Size.y * ca) * 0.5f;
-                    const float bx = (b->m_Size.x * cb + b->m_Size.y * sb) * 0.5f;
-                    const float by = (b->m_Size.x * sb + b->m_Size.y * cb) * 0.5f;
-                    if (std::fabs(a->m_Position.x - b->m_Position.x) > ax + bx ||
-                        std::fabs(a->m_Position.y - b->m_Position.y) > ay + by)
-                    {
-                        continue;
-                    }
+                // 隣接するブロックの内部の面は、衝突面として使わない。
+                const Utility::CollisionResult hit = Utility::Collision::Check(box, tile);
+                if (!hit.IsHit || !hit.HasSeparation || hit.PenetrationDepth <= 0.0f) continue;
+                const vivid::Vector2 normal = hit.Normal;
+                if (normal.y > 0.75f && stage.IsHit(tile_x, tile_y - block_size)) continue;
+                if (normal.y < -0.75f && stage.IsHit(tile_x, tile_y + block_size)) continue;
+                if (normal.x > 0.75f && stage.IsHit(tile_x - block_size, tile_y)) continue;
+                if (normal.x < -0.75f && stage.IsHit(tile_x + block_size, tile_y)) continue;
 
-                    // 各文房具の中心・半サイズ・回転角から OBB を作成する。
-                    // OBB なら斜めに置いた定規同士でも当たり判定が可能。
-                    const Utility::OBB box_a = {
-                        a->m_Position, {a->m_Size.x * 0.5f, a->m_Size.y * 0.5f}, a->m_Rotation
-                    };
-                    const Utility::OBB box_b = {
-                        b->m_Position, {b->m_Size.x * 0.5f, b->m_Size.y * 0.5f}, b->m_Rotation
-                    };
-                    // 重なりの有無に加え、衝突法線とめり込み量も取得する。
-                    const Utility::CollisionResult hit = Utility::Collision::Check(box_a, box_b);
-                    if (!hit.IsHit || !hit.HasSeparation || hit.PenetrationDepth <= 0.0f)
-                    {
-                        continue;
-                    }
-
-                    // 衝突法線は a → b 方向として扱い、左右に押し離す基準にする。
-                    // 異常に短い法線は正規化時に不安定になるため無視する。
-                    has_contact = true;
-                    vivid::Vector2 normal = hit.Normal;
-                    const float normal_sq = vivid::Vector2::Dot(normal, normal);
-                    if (normal_sq < 0.5f) continue;
-                    normal = normal * (1.0f / std::sqrt(normal_sq));
-
-                    // 位置補正フェーズでは速度・接触点の計算は不要。
-                    // 衝突判定後はめり込み量だけを使うため、FPSへの影響を抑える。
-                    bool wake_by_velocity = false;
-                    if (solve_velocity)
-                    {
-                        // それぞれの矩形で接触法線側に張り出した点を探す。
-                        // 2点の中点を近似接触位置とし、中心からの距離 ra / rb を求める。
-                        // 中心からずれた位置に力が加わると、並進だけでなく回転も起こる。
-                        const vivid::Vector2 pa = a->m_Position;
-                        const vivid::Vector2 pb = b->m_Position;
-                        const vivid::Vector2 point_a = GetPairSupport(*a, normal);
-                        const vivid::Vector2 point_b = GetPairSupport(*b, normal * -1.0f);
-                        const vivid::Vector2 point = (point_a + point_b) * 0.5f;
-                        const vivid::Vector2 ra = point - pa;
-                        const vivid::Vector2 rb = point - pb;
-
-                        // 両物体の質量を 1 とした矩形の「逆慣性モーメント」を計算する。
-                        // 値が大きいほど接触の力で回転しやすい。ここでは逆数の形で利用。
-                        // 幅と高さを使い、回転のしやすさを物体の寸法に反映する。
-                        const float inertia_a = 12.0f / (a->m_Size.x * a->m_Size.x +
-                                                         a->m_Size.y * a->m_Size.y);
-                        const float inertia_b = 12.0f / (b->m_Size.x * b->m_Size.x +
-                                                         b->m_Size.y * b->m_Size.y);
-                        // 接触点の速度 = 中心の並進速度 + 角速度による接線速度。
-                        // 物体中心が静止していても、回っていれば接触点は動いている。
-                        const vivid::Vector2 va = a->m_PhysicsVelocity +
-                            PairPerp(ra) * a->m_PhysicsAngularVelocity;
-                        const vivid::Vector2 vb = b->m_PhysicsVelocity +
-                            PairPerp(rb) * b->m_PhysicsAngularVelocity;
-                        // 接触点の相対速度を法線へ投影する。
-                        // vn < 0 は互いに接近中、vn >= 0 は離れる方向なので衝撃を加えない。
-                        const float vn = vivid::Vector2::Dot(vb - va, normal);
-                        wake_by_velocity = (vn < -0.05f);
-
-                        if (vn < 0.0f)
-                        {
-                            // 力の作用点が中心からずれている分を外積で計算する。
-                            // 有効質量には 2 物体の並進抵抗(1+1)と回転抵抗を含める。
-                            const float ca = vivid::Vector2::Cross(ra, normal);
-                            const float cb = vivid::Vector2::Cross(rb, normal);
-                            const float effective_mass = 2.0f + ca * ca * inertia_a + cb * cb * inertia_b;
-                            if (effective_mass > 0.000001f)
-                            {
-                                // 接近速度を打ち消す衝突インパルスを求める（反発係数は加えない）。
-                                // a と b に同じ大きさ・逆向きの速度変化を与える。
-                                const float impulse = -vn / effective_mass;
-                                const vivid::Vector2 push = normal * impulse;
-                                a->m_PhysicsVelocity.x -= push.x;
-                                a->m_PhysicsVelocity.y -= push.y;
-                                b->m_PhysicsVelocity.x += push.x;
-                                b->m_PhysicsVelocity.y += push.y;
-                                // 法線方向の力が重心から離れて作用するため角速度も更新する。
-                                a->m_PhysicsAngularVelocity -= ca * impulse * inertia_a;
-                                b->m_PhysicsAngularVelocity += cb * impulse * inertia_b;
-
-                                // 法線への衝突応答後に接触点の速度をもう一度求める。
-                                // 法線と直交する tangent 方向のすべりを摩擦で抑える。
-                                // 衝突前の速度のまま計算すると摩擦が過不足になりやすい。
-                                const vivid::Vector2 tangent = PairPerp(normal);
-                                const vivid::Vector2 va_next = a->m_PhysicsVelocity +
-                                    PairPerp(ra) * a->m_PhysicsAngularVelocity;
-                                const vivid::Vector2 vb_next = b->m_PhysicsVelocity +
-                                    PairPerp(rb) * b->m_PhysicsAngularVelocity;
-                                const float relative_t = vivid::Vector2::Dot(vb_next - va_next, tangent);
-                                const float ta = vivid::Vector2::Cross(ra, tangent);
-                                const float tb = vivid::Vector2::Cross(rb, tangent);
-                                const float tangent_mass = 2.0f + ta * ta * inertia_a + tb * tb * inertia_b;
-                                // 接線方向のすべりを止めるための理想インパルスを計算する。
-                                // 摩擦の大きさは FRICTION × 法線インパルス以内に制限する。
-                                // これにより摩擦だけが過剰な力を生むことを防ぐ。
-                                const float desired = -relative_t / tangent_mass;
-                                const float limit = m_pair_friction * impulse;
-                                const float friction_impulse = Utility::Max(-limit, Utility::Min(desired, limit));
-                                const vivid::Vector2 friction = tangent * friction_impulse;
-                                // 摩擦も両物体へ逆向きに適用し、並進・回転をともに更新する。
-                                a->m_PhysicsVelocity.x -= friction.x;
-                                a->m_PhysicsVelocity.y -= friction.y;
-                                b->m_PhysicsVelocity.x += friction.x;
-                                b->m_PhysicsVelocity.y += friction.y;
-                                a->m_PhysicsAngularVelocity -= ta * friction_impulse * inertia_a;
-                                b->m_PhysicsAngularVelocity += tb * friction_impulse * inertia_b;
-                            }
-                        }
-
-                    }
-
-                    // 速度補正だけでは、既に重なった位置が直ちに解消しない。
-                    // 許容めり込み m_pair_contact_slop を引いた深さだけ位置を補正する。
-                    // 補正量は m_pair_correction_rate で緩和し、m_pair_max_correction で上限を設定。
-                    // 質量を同じと仮定しているので、a と b を半分ずつ反対へ動かす。
-                    const float depth = Utility::Max(0.0f, hit.PenetrationDepth - m_pair_contact_slop);
-                    if (!solve_velocity)
-                    {
-                        const float correction = Utility::Min(depth * m_pair_correction_rate, m_pair_max_correction);
-                        a->m_Position.x -= normal.x * correction * 0.5f;
-                        a->m_Position.y -= normal.y * correction * 0.5f;
-                        b->m_Position.x += normal.x * correction * 0.5f;
-                        b->m_Position.y += normal.y * correction * 0.5f;
-                    }
-
-                    // Sleep 中の文房具は小さな接触では起こさない。
-                    // 一定以上の接近速度またはめり込みがあれば、両物体を再起動する。
-                    // 静止フレーム数も 0 に戻し、次の更新で物理演算を再開可能にする。
-                    if (wake_by_velocity || depth > 0.5f)
-                    {
-                        a->m_IsPhysicsSleeping = false;
-                        b->m_IsPhysicsSleeping = false;
-                        a->m_PhysicsStillFrames = 0;
-                        b->m_PhysicsStillFrames = 0;
-                    }
-                }
+                AddContact(item, nullptr, box, tile, hit, contacts);
             }
-
-            // この段階で接触がなければ、無駄な残りの反復を終了する。
-            if (!has_contact) break;
         }
+    }
+
+    // 文房具同士の接触。同じペアは1回だけ調べる。
+    for (std::size_t i = 0; i < active.size(); ++i)
+    {
+        IStationery* a = active[i];
+        const float ca = std::fabs(std::cos(a->m_Rotation));
+        const float sa = std::fabs(std::sin(a->m_Rotation));
+        const float ax = (a->m_Size.x * ca + a->m_Size.y * sa) * 0.5f;
+        const float ay = (a->m_Size.x * sa + a->m_Size.y * ca) * 0.5f;
+
+        for (std::size_t j = i + 1; j < active.size(); ++j)
+        {
+            IStationery* b = active[j];
+            const float cb = std::fabs(std::cos(b->m_Rotation));
+            const float sb = std::fabs(std::sin(b->m_Rotation));
+            const float bx = (b->m_Size.x * cb + b->m_Size.y * sb) * 0.5f;
+            const float by = (b->m_Size.x * sb + b->m_Size.y * cb) * 0.5f;
+            if (std::fabs(a->m_Position.x - b->m_Position.x) > ax + bx ||
+                std::fabs(a->m_Position.y - b->m_Position.y) > ay + by)
+            {
+                continue;
+            }
+            const Utility::OBB box_a = GetCollider(*a);
+            const Utility::OBB box_b = GetCollider(*b);
+            const Utility::CollisionResult hit = Utility::Collision::Check(box_a, box_b);
+            AddContact(a, b, box_a, box_b, hit, contacts);
+        }
+    }
+}
+
+/*
+ *  衝突時の速度を変更する
+ *  接触点から中心までの距離で回転のしやすさを変える。
+ *  法線方向は押し戻し、接線方向は摩擦として扱う。
+ */
+void
+CStationeryManager::
+ResolveVelocity(SContact& contact)
+{
+    IStationery* a = contact.A;
+    IStationery* b = contact.B;
+    const vivid::Vector2 ra = contact.Point - a->m_Position;
+    const vivid::Vector2 rb = b != nullptr
+        ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
+
+    // 質量は全て1。地形は質量無限大なので動かさない。
+    const float mass_b = b != nullptr ? 1.0f : 0.0f;
+    const float inertia_a = 12.0f / (a->m_Size.x * a->m_Size.x + a->m_Size.y * a->m_Size.y);
+    const float inertia_b = b != nullptr
+        ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
+
+    const auto point_velocity = [](const IStationery* item, const vivid::Vector2& arm)
+    {
+        if (item == nullptr) return vivid::Vector2(0.0f, 0.0f);
+        return item->m_PhysicsVelocity +
+            vivid::Vector2(-arm.y, arm.x) * item->m_PhysicsAngularSpeed;
+    };
+    const auto impulse_to_bodies = [&](const vivid::Vector2& impulse)
+    {
+        a->m_PhysicsVelocity = a->m_PhysicsVelocity - impulse;
+        a->m_PhysicsAngularSpeed -= vivid::Vector2::Cross(ra, impulse) * inertia_a;
+        if (b != nullptr)
+        {
+            b->m_PhysicsVelocity = b->m_PhysicsVelocity + impulse;
+            b->m_PhysicsAngularSpeed += vivid::Vector2::Cross(rb, impulse) * inertia_b;
+        }
+    };
+
+    const vivid::Vector2 relative = point_velocity(b, rb) - point_velocity(a, ra);
+    const float speed = vivid::Vector2::Dot(relative, contact.Normal);
+    const float cross_a = vivid::Vector2::Cross(ra, contact.Normal);
+    const float cross_b = vivid::Vector2::Cross(rb, contact.Normal);
+    const float effective_mass = 1.0f + mass_b +
+        cross_a * cross_a * inertia_a + cross_b * cross_b * inertia_b;
+
+    // 衝突力を繰り返しの中で累積し、次の反復で力が急に消えないようにする。
+    const float next_impulse = Utility::Max(0.0f, contact.NormalImpulse - speed / effective_mass);
+    const float change = next_impulse - contact.NormalImpulse;
+    contact.NormalImpulse = next_impulse;
+    impulse_to_bodies(contact.Normal * change);
+
+    // 摩擦は接触法線に垂直な方向の速度を抑える。
+    const vivid::Vector2 tangent(-contact.Normal.y, contact.Normal.x);
+    const vivid::Vector2 after = point_velocity(b, rb) - point_velocity(a, ra);
+    const float tangent_speed = vivid::Vector2::Dot(after, tangent);
+    const float ta = vivid::Vector2::Cross(ra, tangent);
+    const float tb = vivid::Vector2::Cross(rb, tangent);
+    const float tangent_mass = 1.0f + mass_b + ta * ta * inertia_a + tb * tb * inertia_b;
+    const float limit = m_friction * contact.NormalImpulse;
+    const float next_friction = Utility::Clamp(
+        contact.TangentImpulse - tangent_speed / tangent_mass, -limit, limit);
+    const float friction_change = next_friction - contact.TangentImpulse;
+    contact.TangentImpulse = next_friction;
+    impulse_to_bodies(tangent * friction_change);
+}
+
+/*
+ *  位置補正。速度とは別に残った重なりだけを少しずつ解消する。
+ *  回転角も接触位置に応じて動かすため、端で支えた定規が自然に倒れる。
+ */
+void
+CStationeryManager::
+ResolvePosition(SContact& contact)
+{
+    const float depth = Utility::Max(0.0f, contact.Depth - m_contact_slop);
+    if (depth <= 0.0f) return;
+
+    IStationery* a = contact.A;
+    IStationery* b = contact.B;
+    const vivid::Vector2 ra = contact.Point - a->m_Position;
+    const vivid::Vector2 rb = b != nullptr
+        ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
+    const float mass_b = b != nullptr ? 1.0f : 0.0f;
+    const float inertia_a = 12.0f / (a->m_Size.x * a->m_Size.x + a->m_Size.y * a->m_Size.y);
+    const float inertia_b = b != nullptr
+        ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
+    const float ca = vivid::Vector2::Cross(ra, contact.Normal);
+    const float cb = vivid::Vector2::Cross(rb, contact.Normal);
+    const float effective_mass = 1.0f + mass_b + ca * ca * inertia_a + cb * cb * inertia_b;
+    if (effective_mass <= 0.000001f) return;
+
+    // 1回で大きく押し戻すと跳ね上がるため、各反復で最大2pxずつ修正する。
+    const float impulse = Utility::Min(depth * m_position_rate, 2.0f) / effective_mass;
+    a->m_Position = a->m_Position - contact.Normal * impulse;
+    a->m_Rotation -= Utility::Clamp(ca * impulse * inertia_a, -0.03f, 0.03f);
+    if (b != nullptr)
+    {
+        b->m_Position = b->m_Position + contact.Normal * impulse;
+        b->m_Rotation += Utility::Clamp(cb * impulse * inertia_b, -0.03f, 0.03f);
     }
 }

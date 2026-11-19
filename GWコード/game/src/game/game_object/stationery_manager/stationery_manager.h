@@ -10,7 +10,6 @@
 #include "stationery_controller.h"
 #include "../../../utility/collision/collision.h"
 
-#include <array>
 #include <memory>
 #include <vector>
 
@@ -88,30 +87,53 @@ public:
 
 private:
 
-    // 地形衝突と同様、文房具同士の衝突計算用補助処理はクラス内で管理する。
-    /*! @brief  法線から摩擦方向の接線を取得する */
-    static vivid::Vector2 PairPerp(const vivid::Vector2& vector);
-
-    /*! @brief  文房具の回転矩形をワールド座標の4頂点へ変換する */
-    static std::array<vivid::Vector2, 4> GetPairCorners(const IStationery& item);
-
-    /*! @brief  接触方向へ最も張り出した頂点（辺の場合は中心）を取得する */
-    static vivid::Vector2 GetPairSupport(const IStationery& item,
-                                          vivid::Vector2 direction);
-
-    // 文房具同士の衝突パラメータ（定義はcpp側にまとめる）。
-    static const float m_pair_contact_slop;
-    static const float m_pair_correction_rate;
-    static const float m_pair_max_correction;
-    static const float m_pair_friction;
-    static const int   m_pair_iterations;
-
     /*!
-     *  @brief      文房具同士の衝突を解決する
+     *  @brief  文房具と地形・文房具同士の接触情報
      *
-     *  地形衝突後に実行する。ドラッグ中の文房具は対象外。
+     *  法線はAからBへ向かう。地形の場合はBをnullptrとする。
+     *  反復計算で必要な衝突力だけ同じサブステップ中に保持する。
      */
-    void            ResolveStationeryPairs(void);
+    struct SContact
+    {
+        IStationery*    A = nullptr;
+        IStationery*    B = nullptr;
+        vivid::Vector2 Normal;
+        vivid::Vector2 Point;
+        float           Depth = 0.0f;
+        float           NormalImpulse = 0.0f;
+        float           TangentImpulse = 0.0f;
+    };
+
+    // 必要最小限の物理設定値。
+    static const int   m_sub_steps;           //!< 1フレームの分割数
+    static const int   m_velocity_iterations; //!< 速度の補正回数
+    static const int   m_position_iterations; //!< めり込みの補正回数
+    static const float m_friction;            //!< 接触面の摩擦係数
+    static const float m_contact_slop;        //!< 許容めり込み(px)
+    static const float m_position_rate;       //!< めり込みの補正割合
+
+    /*! @brief  物体の回転矩形を取得する */
+    static Utility::OBB GetCollider(const IStationery& item);
+
+    /*! @brief  2つの矩形の重なった領域から接触点を求める */
+    static vivid::Vector2 GetContactPoint(
+        const Utility::OBB& a, const Utility::OBB& b);
+
+    /*! @brief  接触があれば情報を追加する */
+    static void AddContact(
+        IStationery* a, IStationery* b, const Utility::OBB& box_a,
+        const Utility::OBB& box_b, const Utility::CollisionResult& hit,
+        std::vector<SContact>& contacts);
+
+    /*! @brief  地形と文房具同士の接触を同じ一覧に集める */
+    void CollectContacts(const std::vector<IStationery*>& active,
+                         std::vector<SContact>& contacts) const;
+
+    /*! @brief  接触点の速度を補正し、摩擦と回転を計算する */
+    static void ResolveVelocity(SContact& contact);
+
+    /*! @brief  衝突によるめり込みを少しずつ解消する */
+    static void ResolvePosition(SContact& contact);
 
     CStationeryController   m_Controller;             //!< 文房具のマウス操作
 
