@@ -1,7 +1,9 @@
-﻿/*!
- *  @file  stationery_manager.cpp
- *  @brief  文房具管理
- *  @date  2026/11/19
+﻿
+/*!
+ *  @file           stationery_manager.h
+ *  @brief          文房具管理
+ *  @author         Ryusei Shimizu
+ *  @date           2026/11/20
  */
 
 #include "stationery_manager.h"
@@ -34,12 +36,6 @@ GetInstance(void)
 }
 
 /*
- *  デストラクタ
- */
-CStationeryManager::
-~CStationeryManager(void) = default;
-
-/*
  *  初期化
  */
 void
@@ -63,11 +59,12 @@ Update(void)
     // ドラッグ中・配置前の文房具を物理の対象から外す。
     std::vector<IStationery*> active;
     active.reserve(m_Stationeries.size());
+
     for (const auto& stationery : m_Stationeries)
     {
         stationery->Update();
-        if (stationery->GetState() != STATIONERY_STATE::HELD &&
-            !m_Controller.IsDragging(stationery.get()))
+
+        if (stationery->GetState() != STATIONERY_STATE::HELD && !m_Controller.IsDragging(stationery.get()))
         {
             active.push_back(stationery.get());
         }
@@ -77,7 +74,8 @@ Update(void)
     // 全文房具を同じ時間ずつ動かし、その都度まとめて衝突を解決する。
     // 個別に落下させてから文房具同士を押し出すと、床との補正が競合しやすい。
     const float dt = 1.0f / static_cast<float>(m_sub_steps);
-    std::vector<SContact> contacts;
+
+    std::vector<Contact> contacts;
     contacts.reserve(active.size() * 8);
 
     for (int step = 0; step < m_sub_steps; ++step)
@@ -89,7 +87,7 @@ Update(void)
         CollectContacts(active, contacts);
         for (int i = 0; i < m_velocity_iterations; ++i)
         {
-            for (SContact& contact : contacts) ResolveVelocity(contact);
+            for (Contact& contact : contacts) ResolveVelocity(contact);
         }
 
         // 3. 速度を変更しても残っているめり込みを解消する。
@@ -98,7 +96,7 @@ Update(void)
         {
             CollectContacts(active, contacts);
             if (contacts.empty()) break;
-            for (SContact& contact : contacts) ResolvePosition(contact);
+            for (Contact& contact : contacts) ResolvePosition(contact);
         }
     }
 }
@@ -170,9 +168,7 @@ IsDragging(void) const
  */
 bool
 CStationeryManager::
-CheckCollision(const Utility::AABB& player,
-               Utility::CollisionResult& result,
-               IStationery*& stationery) const
+CheckCollision(const Utility::AABB& player, Utility::CollisionResult& result, IStationery*& stationery) const
 {
     // 呼び出し元へ前回の衝突情報が残らないよう、出力引数を初期化する。
     result = Utility::CollisionResult{};
@@ -197,8 +193,10 @@ CheckCollision(const Utility::AABB& player,
         // 離れている文房具はSATを実行しないため、文房具が増えた際の負荷を抑える。
         const float c = std::fabs(std::cos(target->GetRotation()));
         const float s = std::fabs(std::sin(target->GetRotation()));
+
         const float half_x = (size.x * c + size.y * s) * 0.5f;
         const float half_y = (size.x * s + size.y * c) * 0.5f;
+
         if (center.x + half_x < player.Position.x ||
             center.x - half_x > player.Position.x + player.Width ||
             center.y + half_y < player.Position.y ||
@@ -207,19 +205,12 @@ CheckCollision(const Utility::AABB& player,
             continue;
         }
 
-        const Utility::OBB collider = {
-            center,
-            {size.x * 0.5f, size.y * 0.5f},
-            target->GetRotation()
-        };
+        const Utility::OBB collider = {center, {size.x * 0.5f, size.y * 0.5f}, target->GetRotation()};
 
-        const Utility::CollisionResult hit =
-            Utility::Collision::Check(player, collider);
+        const Utility::CollisionResult hit = Utility::Collision::Check(player, collider);
 
         // 最も深い接触を代表として返し、呼び出し側で押し戻しに利用する。
-        if (hit.IsHit && hit.HasSeparation &&
-            (stationery == nullptr ||
-             hit.PenetrationDepth > result.PenetrationDepth))
+        if (hit.IsHit && hit.HasSeparation && (stationery == nullptr || hit.PenetrationDepth > result.PenetrationDepth))
         {
             result = hit;
             stationery = target;
@@ -269,11 +260,13 @@ GetContactPoint(const Utility::OBB& a, const Utility::OBB& b)
         a.Center - ax - ay, a.Center + ax - ay,
         a.Center + ax + ay, a.Center - ax + ay
     }};
+
     const std::array<vivid::Vector2, 4> edges =
     {{
         b.Center - bx - by, b.Center + bx - by,
         b.Center + bx + by, b.Center - bx + by
     }};
+
     int count = 4;
 
     // Bの4辺でAの多角形を切り抜き、重なった領域だけを残す。
@@ -323,16 +316,14 @@ GetContactPoint(const Utility::OBB& a, const Utility::OBB& b)
  */
 void
 CStationeryManager::
-AddContact(IStationery* a, IStationery* b,
-           const Utility::OBB& box_a, const Utility::OBB& box_b, const Utility::CollisionResult& hit,
-           std::vector<SContact>& contacts)
+AddContact(IStationery* a, IStationery* b, const Utility::OBB& box_a, const Utility::OBB& box_b, const Utility::CollisionResult& hit, std::vector<Contact>& contacts)
 {
     if (!hit.IsHit || !hit.HasSeparation || hit.PenetrationDepth <= 0.0f) return;
 
     const float length_sq = vivid::Vector2::Dot(hit.Normal, hit.Normal);
     if (length_sq < 0.5f) return;
 
-    SContact contact;
+    Contact contact;
     contact.A = a;
     contact.B = b;
     contact.Normal = hit.Normal * (1.0f / std::sqrt(length_sq));
@@ -347,8 +338,7 @@ AddContact(IStationery* a, IStationery* b,
  */
 void
 CStationeryManager::
-CollectContacts(const std::vector<IStationery*>& active,
-                std::vector<SContact>& contacts) const
+CollectContacts(const std::vector<IStationery*>& active, std::vector<Contact>& contacts) const
 {
     contacts.clear();
     const CStageManager& stage = CStageManager::GetInstance();
@@ -434,30 +424,29 @@ CollectContacts(const std::vector<IStationery*>& active,
  */
 void
 CStationeryManager::
-ResolveVelocity(SContact& contact)
+ResolveVelocity(Contact& contact)
 {
     IStationery* a = contact.A;
     IStationery* b = contact.B;
     const vivid::Vector2 ra = contact.Point - a->m_Position;
-    const vivid::Vector2 rb = b != nullptr
-        ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
+    const vivid::Vector2 rb = b != nullptr ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
 
     // 質量は全て1。地形は質量無限大なので動かさない。
     const float mass_b = b != nullptr ? 1.0f : 0.0f;
     const float inertia_a = 12.0f / (a->m_Size.x * a->m_Size.x + a->m_Size.y * a->m_Size.y);
-    const float inertia_b = b != nullptr
-        ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
+    const float inertia_b = b != nullptr ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
 
     const auto point_velocity = [](const IStationery* item, const vivid::Vector2& arm)
     {
         if (item == nullptr) return vivid::Vector2(0.0f, 0.0f);
-        return item->m_PhysicsVelocity +
-            vivid::Vector2(-arm.y, arm.x) * item->m_PhysicsAngularSpeed;
+
+        return item->m_PhysicsVelocity + vivid::Vector2(-arm.y, arm.x) * item->m_PhysicsAngularSpeed;
     };
     const auto impulse_to_bodies = [&](const vivid::Vector2& impulse)
     {
         a->m_PhysicsVelocity = a->m_PhysicsVelocity - impulse;
         a->m_PhysicsAngularSpeed -= vivid::Vector2::Cross(ra, impulse) * inertia_a;
+
         if (b != nullptr)
         {
             b->m_PhysicsVelocity = b->m_PhysicsVelocity + impulse;
@@ -469,8 +458,8 @@ ResolveVelocity(SContact& contact)
     const float speed = vivid::Vector2::Dot(relative, contact.Normal);
     const float cross_a = vivid::Vector2::Cross(ra, contact.Normal);
     const float cross_b = vivid::Vector2::Cross(rb, contact.Normal);
-    const float effective_mass = 1.0f + mass_b +
-        cross_a * cross_a * inertia_a + cross_b * cross_b * inertia_b;
+
+    const float effective_mass = 1.0f + mass_b + cross_a * cross_a * inertia_a + cross_b * cross_b * inertia_b;
 
     // 衝突力を繰り返しの中で累積し、次の反復で力が急に消えないようにする。
     const float next_impulse = Utility::Max(0.0f, contact.NormalImpulse - speed / effective_mass);
@@ -482,14 +471,17 @@ ResolveVelocity(SContact& contact)
     const vivid::Vector2 tangent(-contact.Normal.y, contact.Normal.x);
     const vivid::Vector2 after = point_velocity(b, rb) - point_velocity(a, ra);
     const float tangent_speed = vivid::Vector2::Dot(after, tangent);
+
     const float ta = vivid::Vector2::Cross(ra, tangent);
     const float tb = vivid::Vector2::Cross(rb, tangent);
     const float tangent_mass = 1.0f + mass_b + ta * ta * inertia_a + tb * tb * inertia_b;
+
     const float limit = m_friction * contact.NormalImpulse;
-    const float next_friction = Utility::Clamp(
-        contact.TangentImpulse - tangent_speed / tangent_mass, -limit, limit);
+
+    const float next_friction = Utility::Clamp(contact.TangentImpulse - tangent_speed / tangent_mass, -limit, limit);
     const float friction_change = next_friction - contact.TangentImpulse;
     contact.TangentImpulse = next_friction;
+
     impulse_to_bodies(tangent * friction_change);
 }
 
@@ -499,29 +491,34 @@ ResolveVelocity(SContact& contact)
  */
 void
 CStationeryManager::
-ResolvePosition(SContact& contact)
+ResolvePosition(Contact& contact)
 {
     const float depth = Utility::Max(0.0f, contact.Depth - m_contact_slop);
     if (depth <= 0.0f) return;
 
     IStationery* a = contact.A;
     IStationery* b = contact.B;
+
     const vivid::Vector2 ra = contact.Point - a->m_Position;
-    const vivid::Vector2 rb = b != nullptr
-        ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
+    const vivid::Vector2 rb = b != nullptr ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
+
     const float mass_b = b != nullptr ? 1.0f : 0.0f;
+
     const float inertia_a = 12.0f / (a->m_Size.x * a->m_Size.x + a->m_Size.y * a->m_Size.y);
-    const float inertia_b = b != nullptr
-        ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
+    const float inertia_b = b != nullptr ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
+
     const float ca = vivid::Vector2::Cross(ra, contact.Normal);
     const float cb = vivid::Vector2::Cross(rb, contact.Normal);
+
     const float effective_mass = 1.0f + mass_b + ca * ca * inertia_a + cb * cb * inertia_b;
     if (effective_mass <= 0.000001f) return;
 
     // 1回で大きく押し戻すと跳ね上がるため、各反復で最大2pxずつ修正する。
     const float impulse = Utility::Min(depth * m_position_rate, 2.0f) / effective_mass;
+
     a->m_Position = a->m_Position - contact.Normal * impulse;
     a->m_Rotation -= Utility::Clamp(ca * impulse * inertia_a, -0.03f, 0.03f);
+
     if (b != nullptr)
     {
         b->m_Position = b->m_Position + contact.Normal * impulse;

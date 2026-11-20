@@ -6,13 +6,13 @@
  *  @date           2026/11/20
  */
 
-
 #include "stationery_controller.h"
 #include "stationery/stationery.h"
+#include "../../../utility/utility.h"
 
 #include <cmath>
 
-const float CStationeryController::m_rotation_step = 0.0872664626f;
+const float CStationeryController::m_rotation_step = 5.0f;  //!< ホイール1目盛りあたりの回転角
 
 /*
  *  マウス入力による文房具操作の更新
@@ -21,25 +21,19 @@ void
 CStationeryController::
 Update(const std::vector<std::unique_ptr<IStationery>>& stationeries)
 {
-    // vividのマウス座標を文房具が使用する浮動小数点の座標へ変換する
+    // vividのマウス座標を取得
     const vivid::Point cursor = vivid::mouse::GetCursorPos();
-    // マウス位置を取得し、選択・移動の判定基準にする。
-    const vivid::Vector2 mouse_position = {
-        static_cast<float>(cursor.x),
-        static_cast<float>(cursor.y)
-    };
+    const vivid::Vector2 mouse_position = {static_cast<float>(cursor.x), static_cast<float>(cursor.y)};
 
     // 右クリックで操作開始前の位置・角度へ戻す
-    if (m_Dragging != nullptr &&
-        vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::RIGHT))
+    if (m_Dragging != nullptr && vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::RIGHT))
     {
         CancelDrag();
         return;
     }
 
     // 未使用の文房具を左クリックで掴む
-    if (m_Dragging == nullptr &&
-        vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::LEFT))
+    if (m_Dragging == nullptr && vivid::mouse::Trigger(vivid::mouse::BUTTON_ID::LEFT))
     {
         m_Dragging = FindStationery(stationeries, mouse_position);
 
@@ -47,19 +41,15 @@ Update(const std::vector<std::unique_ptr<IStationery>>& stationeries)
         {
             // 掴んだ瞬間に落下速度を破棄する
             m_Dragging->ResetPhysicsVelocity();
+
             m_StartPosition = m_Dragging->GetPosition();
             m_StartRotation = m_Dragging->GetRotation();
-            m_DragOffset = {
-                m_StartPosition.x - mouse_position.x,
-                m_StartPosition.y - mouse_position.y
-            };
+
+            m_DragOffset = {m_StartPosition.x - mouse_position.x, m_StartPosition.y - mouse_position.y};
         }
     }
 
-    if (m_Dragging == nullptr)
-    {
-        return;
-    }
+    if (m_Dragging == nullptr) return;
 
     // 別システムでUSEDになった場合は操作を停止する
     if (!m_Dragging->CanManipulate())
@@ -71,18 +61,14 @@ Update(const std::vector<std::unique_ptr<IStationery>>& stationeries)
     // マウスで掴んだ点を維持して移動する
     if (vivid::mouse::Button(vivid::mouse::BUTTON_ID::LEFT))
     {
-        m_Dragging->SetPosition({
-            mouse_position.x + m_DragOffset.x,
-            mouse_position.y + m_DragOffset.y
-        });
+        m_Dragging->SetPosition({mouse_position.x + m_DragOffset.x, mouse_position.y + m_DragOffset.y});
 
         // 回転角はラジアン。ホイール1単位で5度回転する（仮値）
         const int wheel = vivid::mouse::GetWheel();
 
         if (wheel != 0)
         {
-            m_Dragging->SetRotation(
-                m_Dragging->GetRotation() + m_rotation_step * wheel);
+            m_Dragging->SetRotation(m_Dragging->GetRotation() + Utility::DegToRad(m_rotation_step) * wheel);
         }
     }
 
@@ -103,16 +89,14 @@ Update(const std::vector<std::unique_ptr<IStationery>>& stationeries)
  */
 IStationery*
 CStationeryController::
-FindStationery(const std::vector<std::unique_ptr<IStationery>>& stationeries,
-               const vivid::Vector2& position) const
+FindStationery(const std::vector<std::unique_ptr<IStationery>>& stationeries, const vivid::Vector2& position) const
 {
     // 最後に描画した文房具を優先して選択する
     for (auto it = stationeries.rbegin(); it != stationeries.rend(); ++it)
     {
         IStationery* stationery = it->get();
 
-        if (stationery->CanManipulate() &&
-            ContainsPoint(*stationery, position))
+        if (stationery->CanManipulate() && ContainsPoint(*stationery, position))
         {
             return stationery;
         }
@@ -126,23 +110,27 @@ FindStationery(const std::vector<std::unique_ptr<IStationery>>& stationeries,
  */
 bool
 CStationeryController::
-ContainsPoint(const IStationery& stationery,
-              const vivid::Vector2& position) const
+ContainsPoint(const IStationery& stationery, const vivid::Vector2& position) const
 {
+    // 文房具の情報を取得
     const vivid::Vector2& center = stationery.GetPosition();
     const vivid::Vector2& size = stationery.GetSize();
     const float rotation = stationery.GetRotation();
 
-    // 判定対象の回転を打ち消し、ローカル座標で幅・高さを比較する
+    // クリック位置を中心からの相対座標に変換
     const float dx = position.x - center.x;
     const float dy = position.y - center.y;
+
+    // 文房具の回転値を取得
     const float cosine = std::cos(rotation);
     const float sine = std::sin(rotation);
+
+    // マウス座標を文房具のローカル座標系に変換
     const float local_x = dx * cosine + dy * sine;
     const float local_y = -dx * sine + dy * cosine;
 
-    return std::abs(local_x) <= size.x * 0.5f &&
-           std::abs(local_y) <= size.y * 0.5f;
+    // 矩形判定
+    return std::abs(local_x) <= size.x * 0.5f && std::abs(local_y) <= size.y * 0.5f;
 }
 
 /*
@@ -152,10 +140,7 @@ void
 CStationeryController::
 CancelDrag(void)
 {
-    if (m_Dragging == nullptr)
-    {
-        return;
-    }
+    if (m_Dragging == nullptr) return;
 
     // 配置済みの文房具は掴む直前の座標へ戻す
     m_Dragging->SetPosition(m_StartPosition);

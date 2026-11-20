@@ -18,7 +18,7 @@ namespace Utility
     /*! 
      *  @brief  許容誤差
      */
-    constexpr float EPSILON = 0.0001f;
+    constexpr float EPSILON = 0.00001f;
 
     /*!
 	 *  @brief  色のID

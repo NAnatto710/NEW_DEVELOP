@@ -75,7 +75,7 @@ private:
      */
     void            CancelDrag (void);
 
-    static const float  m_rotation_step;    //!< ホイール1目盛りあたりの回転角（5度、ラジアン）
+    static const float  m_rotation_step;    //!< ホイール1目盛りあたりの回転角
 
     IStationery*        m_Dragging;         //!< 操作中の文房具（所有しない）
     vivid::Vector2      m_DragOffset;       //!< マウスと中心座標の差
