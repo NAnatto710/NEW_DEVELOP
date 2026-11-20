@@ -17,14 +17,6 @@ CNormalBlock(void)
 }
 
 /*
- *  デストラクタ
- */
-CNormalBlock::
-~CNormalBlock(void)
-{
-}
-
-/*
  *  初期化
  */
 void

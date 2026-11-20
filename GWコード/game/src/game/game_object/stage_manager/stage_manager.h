@@ -77,6 +77,13 @@ class CStageManager
 	IStageObject*		GetStageObject(int x, int y) const;
 
 	/*!
+	 *	@brief			プレイヤーの初期位置を取得
+	 * 
+	 *	@return			初期位置を返す
+	 */
+	vivid::Vector2		GetInitialPoint(void)const;
+
+	/*!
 	 *  @brief			当たり判定
 	 *
 	 *  @param[in]		x   横
@@ -110,16 +117,14 @@ class CStageManager
 
 private:
 
-	int                         m_map_chip_count_width = 0;         //!< マップの横幅に何ブロック存在するか
-	int                         m_map_chip_count_height = 0;        //!< マップの縦幅に何ブロック存在するか
+	int                         m_map_chip_count_width;         //!< マップの横幅に何ブロック存在するか
+	int                         m_map_chip_count_height;        //!< マップの縦幅に何ブロック存在するか
 
-	static const std::string    m_map_file_name;                //!< マップファイル名
+	static const std::string    m_map_file_name;				//!< マップファイル名
 
-	int 						m_BlockSize = 0;                    //!< ブロックの大きさ
+	int 						m_BlockSize;                    //!< ブロックの大きさ
 
-	// [行][列] でIDを取り出す。値はSTAGE_OBJECT_IDに対応する。
 	std::vector<std::vector<unsigned char>>   m_MapObject;      //!< マップオブジェクトデータ
-	// [行][列] に生成済みオブジェクトを保持。所有権はCStageManagerが持つ。
 	std::vector<std::vector<IStageObject*>>   m_StageObject;    //!< ステージオブジェクトデータ
 
 	// 以下コンストラクタ類

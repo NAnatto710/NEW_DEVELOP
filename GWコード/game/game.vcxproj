@@ -181,6 +181,7 @@
     <ClCompile Include="src\game\game_object\scene_manager\scene_transition.cpp" />
     <ClCompile Include="src\game\game_object\stage_manager\stage_manager.cpp" />
     <ClCompile Include="src\game\game_object\stage_manager\stage_object\block\normal_block\normal_block.cpp" />
+    <ClCompile Include="src\game\game_object\stage_manager\stage_object\point\initial_point\initial_point.cpp" />
     <ClCompile Include="src\game\game_object\stage_manager\stage_object\stage_object.cpp" />
     <ClCompile Include="src\game\game_object\stationery_manager\stationery\ruler\ruler.cpp" />
     <ClCompile Include="src\game\game_object\stationery_manager\stationery\stationery.cpp" />
@@ -224,6 +225,8 @@
     <ClInclude Include="src\game\game_object\stage_manager\stage_manager.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\block_object.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\block\normal_block\normal_block.h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_object\point\initial_point\initial_point.h" />
+    <ClInclude Include="src\game\game_object\stage_manager\stage_object\point\point_object.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object.h" />
     <ClInclude Include="src\game\game_object\stage_manager\stage_object\stage_object_id.h" />
     <ClInclude Include="src\game\game_object\stationery_manager\stationery\ruler\ruler.h" />

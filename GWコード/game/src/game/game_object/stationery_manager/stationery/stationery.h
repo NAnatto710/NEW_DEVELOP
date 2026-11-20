@@ -1,8 +1,8 @@
 ﻿
 /*!
  *  @file           stationery.h
- *  @brief          定規
- *  @author         文房具共通基底
+ *  @brief          文房具共通基底
+ *  @author         Ryusei Shimizu
  *  @date           2026/11/05
  */
 
@@ -127,11 +127,15 @@ protected:
 
     /*!
      *  @brief      物理演算から位置を更新する
+     * 
+     *  @param[in]  position    位置
      */
     void            SetPhysicsPosition(const vivid::Vector2& position);
 
     /*!
      *  @brief      物理演算から回転を更新する
+     * 
+     *  @param[in]  rotation    角度
      */
     void            SetPhysicsRotation(float rotation);
 

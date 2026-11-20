@@ -8,13 +8,14 @@
 
 #include "stage_manager.h"
 #include "stage_object/block/block_object.h"
+#include "stage_object/point/point_object.h"
 #include "../../../utility/csv/csv.h"
 
 #include <exception>
 #include <limits>
 #include <utility>
 
-const std::string	CStageManager::m_map_file_name			= "data\\map\\map.csv";				//!< マップファイル名
+const std::string	CStageManager::m_map_file_name	= "data\\map\\map.csv";	//!< マップファイル名
 
 /*
  *  インスタンスの取得
@@ -202,6 +203,34 @@ GetStageObject(int x, int y) const
 }
 
 /*
+ *	プレイヤーの初期位置を取得
+ */
+vivid::Vector2
+CStageManager::
+GetInitialPoint (void) const
+{
+	vivid::Vector2 pos;
+
+	// すべてのオブジェクトからスタート位置を探す
+	for(int i = 0; i < m_map_chip_count_height; ++i)
+	{
+		for(int k = 0; k < m_map_chip_count_width; ++k)
+		{
+			//スタートフラグが見つかった
+			if(m_MapObject[i][k] == (unsigned char)STAGE_OBJECT_ID::INITIAL_POINT)
+			{
+				// オブジェクト座標から実際の座標に変換して返す
+				pos.x = (float)(k * IStageObject::GetSize ());
+				pos.y = (float)(i * IStageObject::GetSize ());
+
+				return pos;
+			}
+		}
+	}
+	return pos;
+}
+
+/*
  *  当たり判定
  */
 bool
@@ -228,9 +257,6 @@ CStageManager::
 IsHitScaffolding(int x, int y) const
 {
 	IStageObject* object = GetStageObject(x, y);
-
-	// 現在のSTAGE_OBJECT_IDに足場の種類は定義されていない。
-	// 未実装の足場判定が常にtrueになるのを防ぐ。
 	(void)object;
 	return false;
 }
@@ -247,6 +273,7 @@ CreateStageObject(STAGE_OBJECT_ID stage_object_id)
 	switch (stage_object_id)
 	{
 	case STAGE_OBJECT_ID::NORMAL_BLOCK:		stage_object = new CNormalBlock();	break;
+	case STAGE_OBJECT_ID::INITIAL_POINT:	stage_object = new CInitialPoint(); break;
 	case STAGE_OBJECT_ID::NONE:
 	case STAGE_OBJECT_ID::MAX:
 	default:		break;

@@ -27,7 +27,10 @@ CGameMain::
 Initialize (void)
 {
 	CStageManager::GetInstance ().Initialize();
-	CCharacterManager::GetInstance ().Initialize({100.0f, 100.0f}, 64, 64);
+
+	vivid::Vector2 initial_pos = CStageManager::GetInstance().GetInitialPoint();
+	initial_pos.y -= 10;
+	CCharacterManager::GetInstance ().Initialize(initial_pos, 64, 64);
 
 	// 文房具管理の初期化と、表示確認用定規の生成
 	CStationeryManager::GetInstance().Initialize();

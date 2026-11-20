@@ -1,8 +1,8 @@
 ﻿
 /*!
  *  @file           stationery.h
- *  @brief          定規
- *  @author         文房具共通基底
+ *  @brief          文房具共通基底
+ *  @author         Ryusei Shimizu
  *  @date           2026/11/05
  */
 
@@ -11,12 +11,11 @@
 
 #include <cmath>
 
-// 1フレームを何回に分割するかはManagerで管理する。
-const float IStationery::m_gravity           = 0.35f;
-const float IStationery::m_max_fall_speed    = 12.0f;
-const float IStationery::m_linear_damping    = 0.999f;
-const float IStationery::m_angular_damping   = 0.998f;
-const float IStationery::m_max_angular_speed = 0.06f;
+const float IStationery::m_gravity              = 0.35f;       //!< 重力加速度
+const float IStationery::m_max_fall_speed       = 12.0f;       //!< 最大落下速度
+const float IStationery::m_linear_damping       = 0.999f;      //!< 移動速度の減衰
+const float IStationery::m_angular_damping      = 0.998f;      //!< 角速度の減衰
+const float IStationery::m_max_angular_speed    = 0.06f;       //!< 最大回転速度
 
 /*
  *  コンストラクタ
@@ -60,7 +59,7 @@ UpdatePhysics (float delta_time)
     // 最大落下速度内で重力を適応
     m_PhysicsVelocity.y = Utility::Min (m_PhysicsVelocity.y + m_gravity * delta_time, m_max_fall_speed);
 
-    // 1フレームの物理演算を何回に分けて計算するかを変えても減衰率が大きく変わらないようにするためにべき乗を使用する
+    // 1フレームの物理演算を何回に分けて計算するか変えても減衰率が大きく変わらないようにするためにべき乗を使用する
     // std::pow はべき乗の計算に使用できる（引数１の引数２乗）
     
     // 横方向の速度を減退

@@ -13,9 +13,10 @@
  */
 enum class STAGE_OBJECT_ID
 {
-	NONE,				//!< 空
+	NONE = 0,			//!< 空
 
-	NORMAL_BLOCK,		//!< ノーマルブロック
+	NORMAL_BLOCK = 1,		//!< ノーマルブロック
+	INITIAL_POINT = 9,		//!< 初期位置
 
 	MAX					//!< 最大数
 };

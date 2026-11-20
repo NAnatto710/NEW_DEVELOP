@@ -23,7 +23,7 @@ public:
     /*!
      *  @brief      デストラクタ
      */
-    ~CNormalBlock(void);
+    ~CNormalBlock(void) = default;
 
     /*!
      *  @brief      初期化

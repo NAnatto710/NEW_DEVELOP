@@ -1,8 +1,11 @@
-﻿/*!
- *  @file  stationery_controller.cpp
- *  @brief  文房具のマウス操作
- *  @date  2026/11/10
+﻿
+/*!
+ *  @file           stationery_controller.cpp
+ *  @brief          文房具のマウス操作
+ *  @author         Ryusei Shimizu
+ *  @date           2026/11/20
  */
+
 
 #include "stationery_controller.h"
 #include "stationery/stationery.h"
