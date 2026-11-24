@@ -152,24 +152,16 @@ private:
     void                    CollectContacts (const std::vector<IStationery*>& active, std::vector<Contact>& contacts) const;
 
     /*!
-     *  @brief      接触による速度と角速度を補正する
+     *  @brief      接触による速度と角速度を文房具同士や地形との衝突によって、移動速度と回転速度を変化させる
      *
-     *  接触点における相対速度を基に、
-     *  法線方向の衝突応答と接線方向の摩擦を計算する。
-     *  必要な力積を適用し、物体の速度と角速度を補正する。
-     *
-     *  @param[in,out]  contact     速度補正に使用する接触情報
+     *  @param[in]  contact     速度補正に使用する接触情報
      */
     static void             ResolveVelocity (Contact& contact);
 
     /*!
-     *  @brief      衝突による物体同士のめり込みを解消する
+     *  @brief      文房具同士や地形とのめり込みを解消しながら、文房具の位置と角度を補正する
      *
-     *  接触法線とめり込み量を基に、
-     *  接触している物体の位置を補正する。
-     *  めり込みを段階的に解消し、物理挙動の安定化を図る。
-     *
-     *  @param[in,out]  contact     位置補正に使用する接触情報
+     *  @param[in]  contact     位置補正に使用する接触情報
      */
     static void             ResolvePosition (Contact& contact);
 
@@ -182,9 +174,9 @@ private:
     static const float m_contact_slop;        //!< 許容めり込み(px)
     static const float m_position_rate;       //!< めり込みの補正割合
     
-    CStationeryController   m_Controller;             //!< 文房具のマウス操作
+    CStationeryController                       m_Controller;       //!< 文房具のマウス操作
 
-    std::vector<std::unique_ptr<IStationery>> m_Stationeries; //!< 文房具一覧
+    std::vector<std::unique_ptr<IStationery>>   m_Stationeries;     //!< 文房具一覧
 
     // 以下コンストラクタ類
     CStationeryManager(void) = default;

@@ -17,12 +17,12 @@
 #include "../../../utility/utility.h"
 
 // 物理の精度を調整する値はここにまとめる。
-const int   CStationeryManager::m_sub_steps           = 6;
-const int   CStationeryManager::m_velocity_iterations = 8;
-const int   CStationeryManager::m_position_iterations = 4;
-const float CStationeryManager::m_friction            = 0.60f;
-const float CStationeryManager::m_contact_slop        = 0.02f;
-const float CStationeryManager::m_position_rate       = 0.65f;
+const int   CStationeryManager::m_sub_steps             = 6;      //!< 1フレームの分割数
+const int   CStationeryManager::m_velocity_iterations   = 8;      //!< 速度の補正回数
+const int   CStationeryManager::m_position_iterations   = 4;      //!< めり込みの補正回数
+const float CStationeryManager::m_friction              = 0.60f;  //!< 接触面の摩擦係数
+const float CStationeryManager::m_contact_slop          = 0.02f;  //!< 許容めり込み(px)
+const float CStationeryManager::m_position_rate         = 0.65f;  //!< めり込みの補正割合
 
 /*
  *  インスタンスの取得
@@ -58,7 +58,6 @@ Update(void)
 
     // ドラッグ中・配置前の文房具を物理の対象から外す。
     std::vector<IStationery*> active;
-    active.reserve(m_Stationeries.size());
 
     for (const auto& stationery : m_Stationeries)
     {
@@ -76,18 +75,23 @@ Update(void)
     const float dt = 1.0f / static_cast<float>(m_sub_steps);
 
     std::vector<Contact> contacts;
-    contacts.reserve(active.size() * 8);
 
     for (int step = 0; step < m_sub_steps; ++step)
     {
         // 1. 重力・移動・回転
-        for (IStationery* item : active) item->UpdatePhysics(dt);
+        for (IStationery* item : active)
+        {
+            item->UpdatePhysics(dt);
+        }
 
         // 2. 地形と文房具同士を同じルールで押し返す。
         CollectContacts(active, contacts);
         for (int i = 0; i < m_velocity_iterations; ++i)
         {
-            for (Contact& contact : contacts) ResolveVelocity(contact);
+            for (Contact& contact : contacts)
+            {
+                ResolveVelocity(contact);
+            }
         }
 
         // 3. 速度を変更しても残っているめり込みを解消する。
@@ -95,8 +99,13 @@ Update(void)
         for (int i = 0; i < m_position_iterations; ++i)
         {
             CollectContacts(active, contacts);
+
             if (contacts.empty()) break;
-            for (Contact& contact : contacts) ResolvePosition(contact);
+
+            for (Contact& contact : contacts)
+            {
+                ResolvePosition(contact);
+            }
         }
     }
 }
@@ -180,8 +189,7 @@ CheckCollision(const Utility::AABB& player, Utility::CollisionResult& result, IS
         IStationery* target = item.get();
 
         // 配置前およびマウスで移動中の文房具は衝突対象外
-        if (target->GetState() == STATIONERY_STATE::HELD ||
-            m_Controller.IsDragging(target))
+        if (target->GetState() == STATIONERY_STATE::HELD || m_Controller.IsDragging(target))
         {
             continue;
         }
@@ -418,21 +426,25 @@ CollectContacts(const std::vector<IStationery*>& active, std::vector<Contact>& c
 }
 
 /*
- *  衝突時の速度を変更する
- *  接触点から中心までの距離で回転のしやすさを変える。
- *  法線方向は押し戻し、接線方向は摩擦として扱う。
+ *  文房具同士や地形との衝突によって、移動速度と回転速度を変化させる関数。
  */
 void
 CStationeryManager::
 ResolveVelocity(Contact& contact)
 {
+    // 接触している物体と接触位置を取得する
     IStationery* a = contact.A;
     IStationery* b = contact.B;
+
+    // それぞれ中心から接触点までのベクトル
     const vivid::Vector2 ra = contact.Point - a->m_Position;
     const vivid::Vector2 rb = b != nullptr ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
 
-    // 質量は全て1。地形は質量無限大なので動かさない。
+    // 質量設定
+    // 文房具が１、地形が０（０であれば動かさない）
     const float mass_b = b != nullptr ? 1.0f : 0.0f;
+
+    // 回転のしやすさを求める（大きいほど動きづらくなる）
     const float inertia_a = 12.0f / (a->m_Size.x * a->m_Size.x + a->m_Size.y * a->m_Size.y);
     const float inertia_b = b != nullptr ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
 
@@ -442,6 +454,7 @@ ResolveVelocity(Contact& contact)
 
         return item->m_PhysicsVelocity + vivid::Vector2(-arm.y, arm.x) * item->m_PhysicsAngularSpeed;
     };
+
     const auto impulse_to_bodies = [&](const vivid::Vector2& impulse)
     {
         a->m_PhysicsVelocity = a->m_PhysicsVelocity - impulse;
@@ -486,36 +499,44 @@ ResolveVelocity(Contact& contact)
 }
 
 /*
- *  位置補正。速度とは別に残った重なりだけを少しずつ解消する。
- *  回転角も接触位置に応じて動かすため、端で支えた定規が自然に倒れる。
+ *   文房具同士や地形とのめり込みを解消しながら、文房具の位置と角度を補正する
  */
 void
 CStationeryManager::
 ResolvePosition(Contact& contact)
 {
+    // めり込み量を求める
     const float depth = Utility::Max(0.0f, contact.Depth - m_contact_slop);
     if (depth <= 0.0f) return;
 
+    // 接触している物体を取得
     IStationery* a = contact.A;
     IStationery* b = contact.B;
 
+    // 接触している点が中心からどれだけ離れているか
     const vivid::Vector2 ra = contact.Point - a->m_Position;
     const vivid::Vector2 rb = b != nullptr ? contact.Point - b->m_Position : vivid::Vector2(0.0f, 0.0f);
 
+    // 質量設定
+    // 文房具が１、地形が０（０であれば動かさない）
     const float mass_b = b != nullptr ? 1.0f : 0.0f;
 
+    // 回転のしやすさを求める（大きいほど動きづらくなる）
     const float inertia_a = 12.0f / (a->m_Size.x * a->m_Size.x + a->m_Size.y * a->m_Size.y);
     const float inertia_b = b != nullptr ? 12.0f / (b->m_Size.x * b->m_Size.x + b->m_Size.y * b->m_Size.y) : 0.0f;
 
+    // 外積を求めて回転の値を求める
     const float ca = vivid::Vector2::Cross(ra, contact.Normal);
     const float cb = vivid::Vector2::Cross(rb, contact.Normal);
 
-    const float effective_mass = 1.0f + mass_b + ca * ca * inertia_a + cb * cb * inertia_b;
-    if (effective_mass <= 0.000001f) return;
+    // 動作のしやすさを計算
+    const float effective_mass = 1.0f + mass_b + (ca * ca * inertia_a) + (cb * cb * inertia_b);
 
-    // 1回で大きく押し戻すと跳ね上がるため、各反復で最大2pxずつ修正する。
+    // 補正量の計算
     const float impulse = Utility::Min(depth * m_position_rate, 2.0f) / effective_mass;
 
+    // 位置と角度の修正
+    // 極端な回転をしないように制限をかける
     a->m_Position = a->m_Position - contact.Normal * impulse;
     a->m_Rotation -= Utility::Clamp(ca * impulse * inertia_a, -0.03f, 0.03f);
 

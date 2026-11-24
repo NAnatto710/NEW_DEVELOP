@@ -48,8 +48,6 @@ private:
      *  @param[in]  physics     物理演算コンポーネント
      */
     void            Jump (bool jumpPressed, CPhysicsComponent& physics);
-
-private:
     
     static const float  m_move_speed;       //!< 移動速度
     static const float  m_acceleration;     //!< 加速度
